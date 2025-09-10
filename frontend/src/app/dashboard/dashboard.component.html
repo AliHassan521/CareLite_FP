@@ -1,0 +1,32 @@
+<div class="dashboard-container">
+  <nav class="navbar">
+    <div class="brand">CareLite</div>
+    <div class="links">
+      @if (role === 'Admin' || role === 'Staff' || role === 'Clinician') 
+       { <a (click)="goTo('/patients')">Patients</a>}
+      @if (role === 'Admin')
+       { <a (click)="goTo('/audit-logs')">Audit Logs</a>}
+    </div>
+    <div class="user-info">
+      <span>{{ role }}</span>
+      <button (click)="logout()">Logout</button>
+    </div>
+  </nav>
+  <main>
+    <h2>Dashboard</h2>
+    @if (!role) {
+      <div class="error">Unable to determine role. Please sign in again.</div>
+    } @else {
+      <div class="welcome">Welcome, {{ role }}!</div>
+    }
+      @if (role === 'Admin') {
+        <div class="info">Manage/search patients & view audit logs.</div>
+      }
+      @if (role === 'Staff') {
+        <div class="info">Manage/search patients only.</div>
+      }
+      @if (role === 'Clinician') {
+        <div class="info">Search patients only.</div>
+      }
+  </main>
+</div>

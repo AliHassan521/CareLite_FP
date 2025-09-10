@@ -1,0 +1,11 @@
+.dashboard-container { font-family: Arial, sans-serif; }
+.navbar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.5rem 1rem; background: #1976d2; color: #fff;
+}
+.navbar a { color: #fff; margin-left: 1rem; cursor: pointer; text-decoration: none; }
+.navbar button { margin-left: 1rem; cursor: pointer; }
+main { padding: 1rem; }
+.error { color: red; }
+.info { margin-top: 0.5rem; }
+.welcome { font-weight: bold; margin-bottom: 0.5rem; }

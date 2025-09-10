@@ -1,0 +1,47 @@
+# .gitignore for CareLite ASP.NET Core project
+
+# Build results
+bin/
+obj/
+.vs/
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Configuration
+appsettings.Development.json
+
+# Others
+*.dbmdl
+*.bak
+*.sql
+
+# Rider
+.idea/
+*.sln.iml
+
+# Test results
+TestResults/
+
+# NuGet
+*.nupkg
+packages/
+.nuget/
+
+# Publish
+publish/
+
+# Secret files
+secrets.json
