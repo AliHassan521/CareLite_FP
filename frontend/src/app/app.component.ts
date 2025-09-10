@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
+import { MessageComponent } from './shared/message.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, MessageComponent],
   template: `
-  <router-outlet />
+    <app-message />
+    <router-outlet />
   `,
   styles: [],
 })

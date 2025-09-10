@@ -15,14 +15,8 @@ export const routes: Routes = [
   },
   {
     path: 'patients',
-    loadComponent: () => import('./patients/patient-list/patients-list.component').then(m => m.PatientListComponent),
+    loadComponent: () => import('./patients/patients.component').then(m => m.PatientsComponent),
     canActivate: [AuthGuard]
-  },
-  {
-    path: 'audit-logs',
-    loadComponent: () => import('./audit-logs/audit-logs.component').then(m => m.AuditLogsComponent),
-    canActivate: [AuthGuard, RoleGuard],
-    data: { roles: ['Admin'] }
   },
   { path: '**', redirectTo: 'signin' }
 ];

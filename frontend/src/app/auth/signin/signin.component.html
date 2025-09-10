@@ -15,9 +15,7 @@
     @if (sessionExpired) {
       <div class="info">Your session has expired. Please sign in again.</div>
     }
-    @if (error) {
-      <div class="error">{{ error }}</div>
-    }
+  <!-- Error messages are now shown globally via MessageService -->
   </form>
   <div class="switch-link">
     <span>Don't have an account?</span>

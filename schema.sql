@@ -74,4 +74,4 @@ ADD DateOfBirth DATE NULL,
     Address VARCHAR(200) NULL;
 
 
-select * from patients
+select * from AuditLogs

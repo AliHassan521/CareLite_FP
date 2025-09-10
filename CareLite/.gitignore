@@ -26,7 +26,6 @@ appsettings.Development.json
 # Others
 *.dbmdl
 *.bak
-*.sql
 
 # Rider
 .idea/

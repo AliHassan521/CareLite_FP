@@ -1,42 +1,94 @@
+
 <div class="patient-container">
   <h2>Patients</h2>
 
+  @if (role === 'Admin' || role === 'Staff') {
+    <div class="add-patient-form">
+      <h3>Add Patient</h3>
+      <form [formGroup]="addPatientForm" (ngSubmit)="addPatient()">
+        <input formControlName="fullName" placeholder="Full Name" />
+        <input formControlName="email" placeholder="Email" type="email" />
+        <input formControlName="phone" placeholder="Phone" />
+        <input formControlName="dateOfBirth" placeholder="Date of Birth" type="date" />
+        <input formControlName="gender" placeholder="Gender" />
+        <input formControlName="address" placeholder="Address" />
+        <button type="submit" [disabled]="addPatientLoading || addPatientForm.invalid">
+          @if (addPatientLoading) { Adding... } @else { Add Patient }
+        </button>
+        <!-- Success/error messages are now shown globally via MessageService -->
+      </form>
+
+      @if (showDuplicateWarning) {
+        <div class="duplicate-warning">
+          <strong>Potential duplicate(s) found:</strong>
+          <ul>
+            @for (match of duplicateMatches; track match) {
+              <li>
+                Name: {{ match.fullName }}, Email: {{ match.email }}, Phone: {{ match.phone }}
+              </li>
+            }
+          </ul>
+          <div>
+            <button (click)="confirmAddPatient()">Proceed Anyway</button>
+            <button (click)="cancelAddPatient()">Cancel</button>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (role === 'Clinician') {
+    <div class="info" style="margin-bottom:1rem;">
+      As a Clinician, you can only view/search patients. Adding new patients is not permitted.
+    </div>
+  }
+
   <div class="controls">
-    <input type="text" placeholder="Search by name/email/phone..." [(ngModel)]="searchQuery" />
-    <button (click)="onSearch()">Search</button>
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()" style="display: flex; gap: 0.5rem; align-items: center;">
+      <input type="text" placeholder="Search by name/email/phone..." formControlName="query" />
+      <button type="submit">Search</button>
+    </form>
   </div>
 
-  <div *ngIf="loading">Loading...</div>
-  <div *ngIf="error" class="error">{{ error }}</div>
+  @if (loading) {
+    <div>Loading...</div>
+  }
+  @if (error) {
+    <div class="error">{{ error }}</div>
+  }
 
-  <table *ngIf="patients.length > 0">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Phone</th>
-        <th>Date of Birth</th>
-        <th>Gender</th>
-        <th>Address</th>
-        <th>Created At</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let patient of patients">
-        <td>{{ patient.fullName }}</td>
-        <td>{{ patient.email }}</td>
-        <td>{{ patient.phone }}</td>
-        <td>{{ patient.dateOfBirth | date }}</td>
-        <td>{{ patient.gender }}</td>
-        <td>{{ patient.address }}</td>
-        <td>{{ patient.createdAt | date:'short' }}</td>
-      </tr>
-    </tbody>
-  </table>
+  @if (patients.length > 0) {
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Date of Birth</th>
+          <th>Gender</th>
+          <th>Address</th>
+          <th>Created At</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (patient of patients; track patient) {
+          <tr>
+            <td>{{ patient.fullName }}</td>
+            <td>{{ patient.email }}</td>
+            <td>{{ patient.phone }}</td>
+            <td>{{ patient.dateOfBirth | date }}</td>
+            <td>{{ patient.gender }}</td>
+            <td>{{ patient.address }}</td>
+            <td>{{ patient.createdAt | date:'short' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
 
-  <div class="pagination" *ngIf="totalCount > pageSize">
-    <button (click)="changePage(page - 1)" [disabled]="page === 1">Prev</button>
-    <span>Page {{ page }} of {{ Math.ceil(totalCount / pageSize) }}</span>
-    <button (click)="changePage(page + 1)" [disabled]="page >= Math.ceil(totalCount / pageSize)">Next</button>
-  </div>
+  @if (totalCount > pageSize) {
+    <div class="pagination">
+      <button (click)="changePage(page - 1)" [disabled]="page === 1">Prev</button>
+      <span>Page {{ page }} of {{ totalPages }}</span>
+      <button (click)="changePage(page + 1)" [disabled]="page >= totalPages">Next</button>
+    </div>
+  }
 </div>

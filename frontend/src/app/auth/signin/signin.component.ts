@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { MessageService } from '../../services/message.service';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from "@angular/common/http";
 import { Router, RouterLink } from "@angular/router";
@@ -12,15 +13,16 @@ import { environment } from '../../../environments/environment';
   imports: [ReactiveFormsModule, RouterLink],
 })
 export class SigninComponent {
-  private baseUrl = environment.apiBaseUrl;
+  private baseUrl = environment.apibaseUrl;
   signinForm: FormGroup;
   loading = false;
-  error: string | null = null;
+  error: string | null = null; // Only for form validation
 
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
-    private router: Router
+  private router: Router,
+  private messageService: MessageService
   ) {
     this.signinForm = this.fb.group({
       username: ["", [Validators.required]],
@@ -31,7 +33,7 @@ export class SigninComponent {
   onSubmit() {
     this.error = null;
     if (this.signinForm.invalid) {
-      this.error = "Please enter your username and password.";
+      this.messageService.showMessage({ type: 'error', text: 'Please enter your username and password.' }, 4000);
       return;
     }
     this.loading = true;
@@ -47,16 +49,18 @@ export class SigninComponent {
             const token = res.body.Token || res.body.token;
             localStorage.setItem("token", token);
             this.router.navigate(["/dashboard"]);
+            this.messageService.showMessage({ type: 'success', text: 'Signed in successfully!' }, 4000);
           } else {
-            this.error = "Invalid server response. Token not found.";
+            this.messageService.showMessage({ type: 'error', text: 'Invalid server response. Token not found.' }, 4000);
           }
         },
         error: (err) => {
           const correlation =
             err.headers?.get("X-Correlation-Id") || err.error?.CorrelationId;
-          this.error =
-            (err.error?.Message || "Login failed.") +
-            (correlation ? ` (Ref: ${correlation})` : "");
+          this.messageService.showMessage({
+            type: 'error',
+            text: (err.error?.Message || 'Login failed.') + (correlation ? ` (Ref: ${correlation})` : '')
+          }, 4000);
         },
       })
       .add(() => (this.loading = false));

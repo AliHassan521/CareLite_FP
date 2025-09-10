@@ -82,7 +82,7 @@ IF OBJECT_ID('sp_CreatePatient', 'P') IS NOT NULL
     DROP PROCEDURE sp_CreatePatient;
 GO
 
-ALTER PROCEDURE sp_CreatePatient
+Create PROCEDURE sp_CreatePatient
     @FullName VARCHAR(150),
     @Email VARCHAR(150),
     @Phone VARCHAR(50),
@@ -126,5 +126,49 @@ BEGIN
     WHERE (@FullName IS NOT NULL AND FullName LIKE '%' + @FullName + '%')
        OR (@Email IS NOT NULL AND Email = @Email)
        OR (@Phone IS NOT NULL AND Phone = @Phone);
+END
+GO
+
+IF OBJECT_ID('sp_SearchPatients', 'P') IS NOT NULL
+    DROP PROCEDURE sp_SearchPatients;
+GO
+CREATE PROCEDURE sp_SearchPatients
+    @Query VARCHAR(150) = NULL,
+    @Page INT = 1,
+    @PageSize INT = 10
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Calculate paging
+    DECLARE @Offset INT = (@Page - 1) * @PageSize;
+
+    -- Main query with search and paging
+    SELECT 
+        PatientId,
+        FullName,
+        Email,
+        Phone,
+        DateOfBirth,
+        Gender,
+        Address,
+        CreatedAt
+    FROM Patients
+    WHERE 
+        (@Query IS NULL OR
+         FullName LIKE '%' + @Query + '%' OR
+         Email LIKE '%' + @Query + '%' OR
+         Phone LIKE '%' + @Query + '%')
+    ORDER BY CreatedAt DESC
+    OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+
+    -- Total count for pagination
+    SELECT COUNT(*) AS TotalCount
+    FROM Patients
+    WHERE 
+        (@Query IS NULL OR
+         FullName LIKE '%' + @Query + '%' OR
+         Email LIKE '%' + @Query + '%' OR
+         Phone LIKE '%' + @Query + '%');
 END
 GO

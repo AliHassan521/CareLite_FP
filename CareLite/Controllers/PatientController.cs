@@ -9,7 +9,6 @@ namespace CareLite.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Admin,Staff")]
     public class PatientController : ControllerBase
     {
         private readonly IPatientRepository _patientRepository;
@@ -22,12 +21,12 @@ namespace CareLite.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin,Staff")]
         public async Task<IActionResult> Create([FromBody] CreatePatientRequest request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            // Check for duplicates before creation
             var duplicates = await _patientRepository.FindPatientDuplicatesAsync(request.FullName, request.Email, request.Phone);
             if (duplicates.Any())
                 return Conflict(new { Message = "Potential duplicate found.", Matches = duplicates });
@@ -46,11 +45,18 @@ namespace CareLite.Controllers
             if (created == null)
                 return Conflict(new { Message = "Duplicate patient found." });
 
-            // Add audit log
+
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            int? userId = null;
+            if(int.TryParse(userIdClaim, out var parseId))
+            {
+                userId = parseId;
+            }
+
             await _auditLogService.AddAsync(new AuditLog
             {
                 CorrelationId = Guid.NewGuid(),
-                UserId = int.TryParse(User.Identity?.Name, out var userId) ? userId : null,
+                UserId = userId,
                 Action = "Create Patient",
                 Description = $"Patient {created.FullName} created with ID {created.PatientId}",
                 CreatedAt = DateTime.UtcNow
@@ -60,6 +66,7 @@ namespace CareLite.Controllers
         }
 
         [HttpPost("check-duplicates")]
+        [Authorize(Roles = "Admin,Staff")]
         public async Task<IActionResult> CheckDuplicates([FromBody] CreatePatientRequest request)
         {
             var matches = await _patientRepository.FindPatientDuplicatesAsync(request.FullName, request.Email, request.Phone);

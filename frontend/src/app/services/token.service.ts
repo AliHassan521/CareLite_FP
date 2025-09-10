@@ -22,4 +22,8 @@ export class TokenService {
     const now = Math.floor(Date.now() / 1000);
     return payload?.exp && payload.exp < now;
   }
+
+  getToken() {
+    return localStorage.getItem('token');
+  }
 }

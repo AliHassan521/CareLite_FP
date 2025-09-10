@@ -7,7 +7,7 @@ namespace CareLite.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Admin")]
+    // [Authorize(Roles = "Admin")]
     public class AuditLogController : ControllerBase
     {
         private readonly IAuditLogRepository _auditLogRepository;
