@@ -10,7 +10,7 @@
   <div>No appointments found for this week.</div>
 }
 @if (appointments.length > 0) {
-  <table>
+  <!-- <table>
     <thead>
       <tr>
         <th>Patient</th>
@@ -29,5 +29,6 @@
         </tr>
       }
     </tbody>
-  </table>
+  </table> -->
+  <app-provider-calendar [appointments]="appointments" />
 }

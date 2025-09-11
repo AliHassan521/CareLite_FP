@@ -1,5 +1,5 @@
 @if (message) {
-      <div [ngClass]="'msg-' + message.type" class="user-message">
-        {{ message.text }}
-      </div>
-    }
+  <div [class]="'user-message msg-' + message.type">
+    {{ message.text }}
+  </div>
+}

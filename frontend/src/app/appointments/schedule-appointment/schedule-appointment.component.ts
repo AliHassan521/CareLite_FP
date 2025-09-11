@@ -6,6 +6,7 @@ import { MessageService } from '../../services/message.service';
 import { environment } from '../../../environment/environment';
 import { TokenService } from '../../services/token.service';
 import { NavbarComponent } from '../../shared/navbar/navbar.component';
+import { AppointmentValidators } from '../appointment-validators';
 
 @Component({
   selector: 'app-schedule-appointment',
@@ -16,12 +17,20 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
 })
 export class ScheduleAppointmentComponent implements OnInit {
   form = inject(FormBuilder).nonNullable.group({
-    patientId: [null, Validators.required],
-    providerId: [null, Validators.required],
-    date: ['', Validators.required],
-    time: ['', Validators.required],
-    durationMinutes: [15, Validators.required]
-  });
+  patientId: [null, Validators.required],
+  providerId: [null, Validators.required],
+  date: ['', [Validators.required, AppointmentValidators.notPastDate()]],
+  time: [
+    '',
+    [
+      Validators.required,
+      AppointmentValidators.withinBusinessHours(),
+      AppointmentValidators.notInBreakTime()
+    ]
+  ],
+  durationMinutes: [15, Validators.required]
+});
+
   patients: any[] = [];
   providers: any[] = [];
   loading = false;
@@ -82,3 +91,4 @@ export class ScheduleAppointmentComponent implements OnInit {
     }).add(() => this.loading = false);
   }
 }
+

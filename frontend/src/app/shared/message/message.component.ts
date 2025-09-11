@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-message',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './message.component.html',
   styleUrls: ['./message.component.scss']
 })

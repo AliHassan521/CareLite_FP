@@ -4,11 +4,12 @@ import { AppointmentService } from '../appointment.service';
 import { TokenService } from '../../services/token.service';
 import { Appointment } from '../appointment.model';
 import { NavbarComponent } from "../../shared/navbar/navbar.component";
+import { ProviderCalendarComponent } from '../provider-calendar/provider-calendar.component';
 
 @Component({
   selector: 'app-my-appointments',
   standalone: true,
-  imports: [DatePipe, NavbarComponent],
+  imports: [DatePipe, NavbarComponent, ProviderCalendarComponent],
   templateUrl: './my-appointments.component.html',
   styleUrls: ['./my-appointments.component.scss']
 })

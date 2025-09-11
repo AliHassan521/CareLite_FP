@@ -5,25 +5,43 @@
     <label>Patient</label>
     <select formControlName="patientId">
       @for (patient of patients; track patient.patientId) {
-        <option [value]="patient.patientId">{{ patient.fullName }}</option>
+      <option [value]="patient.patientId">{{ patient.fullName }}</option>
       }
     </select>
     <label>Provider</label>
     <select formControlName="providerId">
       @for (provider of providers; track provider.userId) {
-        <option [value]="provider.userId">{{ provider.fullName }}</option>
+      <option [value]="provider.userId">{{ provider.fullName }}</option>
       }
     </select>
-    <label>Date</label>
+    <!-- <label>Date</label>
     <input type="date" formControlName="date" />
     <label>Time</label>
+    <input type="time" formControlName="time" /> -->
+    <input type="date" formControlName="date" />
+    @if (form.controls.date.hasError('pastDate') && form.controls.date.touched)
+    {
+    <div class="error">Date cannot be in the past.</div>
+    }
+
     <input type="time" formControlName="time" />
+
+    @if (form.controls.time.hasError('outsideBusinessHours') &&
+    form.controls.time.touched) {
+    <div class="error">Time must be between 09:00 and 17:00.</div>
+    } @if (form.controls.time.hasError('inBreakTime') &&
+    form.controls.time.touched) {
+    <div class="error">Cannot schedule during break (13:00–14:00).</div>
+    }
+
     <label>Duration</label>
     <select formControlName="durationMinutes">
       <option [value]="15">15 minutes</option>
       <option [value]="30">30 minutes</option>
       <option [value]="60">60 minutes</option>
     </select>
-    <button type="submit" [disabled]="form.invalid || loading">@if (loading) { Scheduling... } @else { Schedule }</button>
+    <button type="submit" [disabled]="form.invalid || loading">
+      @if (loading) { Scheduling... } @else { Schedule }
+    </button>
   </form>
 </div>
