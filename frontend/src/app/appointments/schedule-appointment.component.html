@@ -1,0 +1,29 @@
+<app-navbar />
+<div class="appointment-container">
+  <h2>Schedule Appointment</h2>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <label>Patient</label>
+    <select formControlName="patientId">
+      @for (patient of patients; track patient.patientId) {
+        <option [value]="patient.patientId">{{ patient.fullName }}</option>
+      }
+    </select>
+    <label>Provider</label>
+    <select formControlName="providerId">
+      @for (provider of providers; track provider.userId) {
+        <option [value]="provider.userId">{{ provider.fullName }}</option>
+      }
+    </select>
+    <label>Date</label>
+    <input type="date" formControlName="date" />
+    <label>Time</label>
+    <input type="time" formControlName="time" />
+    <label>Duration</label>
+    <select formControlName="durationMinutes">
+      <option [value]="15">15 minutes</option>
+      <option [value]="30">30 minutes</option>
+      <option [value]="60">60 minutes</option>
+    </select>
+    <button type="submit" [disabled]="form.invalid || loading">@if (loading) { Scheduling... } @else { Schedule }</button>
+  </form>
+</div>

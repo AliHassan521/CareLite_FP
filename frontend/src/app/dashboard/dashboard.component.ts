@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { NavbarComponent } from '../shared/navbar.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
+  imports: [NavbarComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
@@ -31,14 +33,5 @@ export class DashboardComponent {
       return;
     }
     this.loading = false;
-  }
-
-  goTo(path: string) {
-    this.router.navigate([path]);
-  }
-
-  logout() {
-    localStorage.removeItem('token');
-    this.router.navigate(['/signin']);
   }
 }

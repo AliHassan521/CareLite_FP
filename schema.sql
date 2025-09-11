@@ -73,5 +73,41 @@ ADD DateOfBirth DATE NULL,
     Gender VARCHAR(10) NULL,
     Address VARCHAR(200) NULL;
 
+-- Drop if exists
+IF OBJECT_ID('Appointments', 'U') IS NOT NULL
+    DROP TABLE Appointments;
+GO
 
-select * from AuditLogs
+CREATE TABLE Appointments (
+    AppointmentId INT IDENTITY(1,1) PRIMARY KEY,
+    PatientId INT NOT NULL,
+    ProviderId INT NOT NULL, -- UserId of provider (Clinician)
+    StartTime DATETIME NOT NULL,
+    DurationMinutes INT NOT NULL, -- 15, 30, or 60
+    Status VARCHAR(20) NOT NULL DEFAULT 'Scheduled', -- Scheduled, Completed, Cancelled, No-Show
+    CreatedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
+    UpdatedAt DATETIME NULL,
+    CONSTRAINT FK_Appointment_Patient FOREIGN KEY (PatientId) REFERENCES Patients(PatientId),
+    CONSTRAINT FK_Appointment_Provider FOREIGN KEY (ProviderId) REFERENCES Users(UserId)
+);
+GO
+
+-- Dummy Patients
+INSERT INTO Patients (FullName, Email, Phone, DateOfBirth, Gender, Address)
+VALUES
+('Jane Smith', 'jane.smith@example.com', '2345678901', '1990-05-15', 'Female', '456 Oak Ave'),
+('Alice Johnson', 'alice.johnson@example.com', '3456789012', '1978-09-23', 'Female', '789 Pine Rd'),
+('Bob Brown', 'bob.brown@example.com', '4567890123', '1982-12-11', 'Male', '321 Maple Dr');
+
+-- Dummy Users (with roles)
+-- First, get RoleIds
+-- SELECT * FROM Roles;
+-- Assume: 1=Admin, 2=Staff, 3=Clinician
+INSERT INTO Users (Username, PasswordHash, FullName, Email, Phone, RoleId, IsActive, CreatedAt)
+VALUES
+('admin1', '$2a$11$Qe6Qw6Qw6Qw6Qw6Qw6Qw6uQw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6', 'Admin User', 'admin1@clinic.com', '5551112222', 1, 1, GETUTCDATE()),
+('staff1', '$2a$11$Qe6Qw6Qw6Qw6Qw6Qw6Qw6uQw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6', 'Staff User', 'staff1@clinic.com', '5552223333', 2, 1, GETUTCDATE()),
+('clinician1', '$2a$11$Qe6Qw6Qw6Qw6Qw6Qw6Qw6uQw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6', 'Dr. Alice Clinician', 'clinician1@clinic.com', '5553334444', 3, 1, GETUTCDATE()),
+('clinician2', '$2a$11$Qe6Qw6Qw6Qw6Qw6Qw6Qw6uQw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6', 'Dr. Bob Clinician', 'clinician2@clinic.com', '5554445555', 3, 1, GETUTCDATE());
+
+select * from Patients

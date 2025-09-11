@@ -1,17 +1,5 @@
+<app-navbar />
 <div class="dashboard-container">
-  <nav class="navbar">
-    <div class="brand">CareLite</div>
-    <div class="links">
-      @if (role === 'Admin' || role === 'Staff' || role === 'Clinician') 
-       { <a (click)="goTo('/patients')">Patients</a>}
-      <!-- @if (role === 'Admin')
-       { <a (click)="goTo('/audit-logs')">Audit Logs</a>} -->
-    </div>
-    <div class="user-info">
-      <span>{{ role }}</span>
-      <button (click)="logout()">Logout</button>
-    </div>
-  </nav>
   <main>
     <h2>Dashboard</h2>
     @if (!role) {

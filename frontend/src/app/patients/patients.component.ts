@@ -2,13 +2,14 @@ import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from './rxjs-helpers';
 import { debounceTime, distinctUntilChanged } from './rxjs-helpers';
 import { HttpClient } from '@angular/common/http';
-import { FormBuilder, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
-import { environment } from '../../environments/environment';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { environment } from '../../environment/environment';
 import { TokenService } from '../services/token.service';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MessageService } from '../services/message.service';
 import {Patient} from './patient.model'
+import { NavbarComponent } from '../shared/navbar.component';
 
 // interface Patient {
 //   patientId?: number;
@@ -24,7 +25,7 @@ import {Patient} from './patient.model'
 @Component({
   selector: 'app-patients',
   standalone: true,
-    imports: [ReactiveFormsModule, DatePipe],
+  imports: [ReactiveFormsModule, DatePipe, NavbarComponent],
   templateUrl: './patients.component.html',
   styleUrls: ['./patients.component.scss']
 })
@@ -150,7 +151,7 @@ export class PatientsComponent implements OnInit, OnDestroy {
       const token = this.tokenService.getToken();
       const headers: { [header: string]: string } = {};
       if (token) headers['Authorization'] = `Bearer ${token}`;
-      this.http.post(`${environment.apibaseUrl}/patient`, patient, { headers })
+      this.http.post(`${environment.apiBaseUrl}/patient`, patient, { headers })
         .subscribe({
           next: (res) => {
             this.messageService.showMessage({ type: 'success', text: 'Patient added successfully!' }, 4000);
@@ -177,7 +178,7 @@ export class PatientsComponent implements OnInit, OnDestroy {
     const headers: { [header: string]: string } = {};
     if (token) headers['Authorization'] = `Bearer ${token}`;
     this.http.get<{ patients: Patient[]; total: number }>(
-      `${environment.apibaseUrl}/patient/search`,
+      `${environment.apiBaseUrl}/patient/search`,
       { params, headers }
     ).subscribe({
       next: (res) => {

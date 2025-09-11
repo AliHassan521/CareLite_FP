@@ -18,5 +18,10 @@ export const routes: Routes = [
     loadComponent: () => import('./patients/patients.component').then(m => m.PatientsComponent),
     canActivate: [AuthGuard]
   },
+  {
+    path: 'schedule-appointment',
+    loadComponent: () => import('./appointments/schedule-appointment.component').then(m => m.ScheduleAppointmentComponent),
+    canActivate: [AuthGuard]
+  },
   { path: '**', redirectTo: 'signin' }
 ];

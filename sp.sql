@@ -17,6 +17,44 @@ END
 GO
 
 -- Drop existing SP if exists
+IF OBJECT_ID('sp_SearchUsers', 'P') IS NOT NULL
+    DROP PROCEDURE sp_SearchUsers;
+GO
+
+CREATE PROCEDURE sp_SearchUsers
+    @Query VARCHAR(150) = NULL,
+    @Page INT = 1,
+    @PageSize INT = 1000
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @Offset INT = (@Page - 1) * @PageSize;
+
+    SELECT 
+        u.UserId,
+        u.Username,
+        u.FullName,
+        u.Email,
+        u.Phone,
+        u.RoleId,
+        r.RoleName,
+        u.IsActive,
+        u.CreatedAt
+    FROM Users u
+    INNER JOIN Roles r ON u.RoleId = r.RoleId
+    WHERE (@Query IS NULL OR u.FullName LIKE '%' + @Query + '%' OR u.Username LIKE '%' + @Query + '%' OR u.Email LIKE '%' + @Query + '%')
+    ORDER BY u.FullName
+    OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+
+    -- Total count for pagination
+    SELECT COUNT(*) AS TotalCount
+    FROM Users u
+    WHERE (@Query IS NULL OR u.FullName LIKE '%' + @Query + '%' OR u.Username LIKE '%' + @Query + '%' OR u.Email LIKE '%' + @Query + '%');
+END
+GO
+
+
+-- Drop existing SP if exists
 IF OBJECT_ID('sp_CreateUser', 'P') IS NOT NULL
     DROP PROCEDURE sp_CreateUser;
 GO
@@ -170,5 +208,80 @@ BEGIN
          FullName LIKE '%' + @Query + '%' OR
          Email LIKE '%' + @Query + '%' OR
          Phone LIKE '%' + @Query + '%');
+END
+GO
+
+-- Drop if exists
+IF OBJECT_ID('sp_CreateAppointment', 'P') IS NOT NULL
+    DROP PROCEDURE sp_CreateAppointment;
+GO
+
+CREATE PROCEDURE sp_CreateAppointment
+    @PatientId INT,
+    @ProviderId INT,
+    @StartTime DATETIME,
+    @DurationMinutes INT,
+    @AppointmentId INT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Enforce allowed durations
+    IF @DurationMinutes NOT IN (15, 30, 60)
+    BEGIN
+        RAISERROR('Invalid duration. Only 15, 30, or 60 minutes allowed.', 16, 1);
+        RETURN;
+    END
+
+    -- Enforce business hours (example: 08:00 to 18:00)
+    IF DATEPART(HOUR, @StartTime) < 8 OR DATEPART(HOUR, DATEADD(MINUTE, @DurationMinutes, @StartTime)) > 18
+    BEGIN
+        RAISERROR('Appointment must be within business hours (08:00-18:00).', 16, 1);
+        RETURN;
+    END
+
+    -- Prevent double-booking for provider
+    IF EXISTS (
+        SELECT 1 FROM Appointments
+        WHERE ProviderId = @ProviderId
+          AND Status = 'Scheduled'
+          AND (
+                (@StartTime >= StartTime AND @StartTime < DATEADD(MINUTE, DurationMinutes, StartTime))
+             OR (DATEADD(MINUTE, @DurationMinutes, @StartTime) > StartTime AND DATEADD(MINUTE, @DurationMinutes, @StartTime) <= DATEADD(MINUTE, DurationMinutes, StartTime))
+             OR (@StartTime <= StartTime AND DATEADD(MINUTE, @DurationMinutes, @StartTime) >= DATEADD(MINUTE, DurationMinutes, StartTime))
+          )
+    )
+    BEGIN
+        RAISERROR('Provider is already booked for this time slot.', 16, 1);
+        RETURN;
+    END
+
+    INSERT INTO Appointments (PatientId, ProviderId, StartTime, DurationMinutes)
+    VALUES (@PatientId, @ProviderId, @StartTime, @DurationMinutes);
+
+    SET @AppointmentId = SCOPE_IDENTITY();
+END
+GO
+
+-- Drop if exists
+IF OBJECT_ID('sp_GetProviderAppointments', 'P') IS NOT NULL
+    DROP PROCEDURE sp_GetProviderAppointments;
+GO
+
+CREATE PROCEDURE sp_GetProviderAppointments
+    @ProviderId INT,
+    @WeekStart DATETIME, -- Monday 00:00 of the week
+    @WeekEnd DATETIME    -- Sunday 23:59 of the week
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT a.*, p.FullName AS PatientName
+    FROM Appointments a
+    INNER JOIN Patients p ON a.PatientId = p.PatientId
+    WHERE a.ProviderId = @ProviderId
+      AND a.StartTime >= @WeekStart
+      AND a.StartTime < @WeekEnd
+    ORDER BY a.StartTime;
 END
 GO

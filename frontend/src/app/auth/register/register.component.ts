@@ -3,7 +3,7 @@ import { MessageService } from '../../services/message.service';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../environment/environment';
 
 @Component({
   selector: 'app-register',
@@ -13,7 +13,7 @@ import { environment } from '../../../environments/environment';
   imports: [ReactiveFormsModule, RouterLink]
 })
 export class RegisterComponent {
-  private baseUrl = environment.apibaseUrl;
+  private baseUrl = environment.apiBaseUrl;
   registerForm: FormGroup;
   loading = false;
   error: string | null = null; // Only for form validation

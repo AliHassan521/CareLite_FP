@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environment/environment';
 import { Patient } from '../patients/patient.model';
 
 @Injectable({ providedIn: 'root' })
 export class PatientService {
-  private baseUrl = environment.apibaseUrl;
+  private baseUrl = environment.apiBaseUrl;
 
   constructor(private http: HttpClient) {}
 
   getPatients() {
-    return this.http.get<Patient[]>(`${this.baseUrl}/patients`);
+    return this.http.get<Patient[]>(`${this.baseUrl}/patient`);
   }
 
   getPatientById(id: number) {
