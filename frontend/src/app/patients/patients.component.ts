@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MessageService } from '../services/message.service';
 import {Patient} from './patient.model'
-import { NavbarComponent } from '../shared/navbar.component';
+import { NavbarComponent } from '../shared/navbar/navbar.component';
 
 // interface Patient {
 //   patientId?: number;

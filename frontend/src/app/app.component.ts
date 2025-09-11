@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
-import { MessageComponent } from './shared/message.component';
+import { MessageComponent } from './shared/message/message.component';
 
 @Component({
   selector: 'app-root',

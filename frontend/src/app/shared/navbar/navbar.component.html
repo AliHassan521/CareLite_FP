@@ -1,0 +1,21 @@
+<nav class="navbar">
+      <div class="brand" (click)="goTo('/dashboard')" style="cursor:pointer; font-weight:600;">CareLite</div>
+      <div class="links">
+        <!-- @if (role === 'Admin' || role === 'Staff' || role === 'Clinician') {
+          <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+        } -->
+        @if (role === 'Admin' || role === 'Staff') {
+          <a routerLink="/patients" routerLinkActive="active">Patients</a>
+        }
+        @if (role === 'Admin' || role === 'Staff') {
+          <a routerLink="/schedule-appointment" routerLinkActive="active">Schedule Appointment</a>
+        }
+        @if (role === 'Clinician') {
+          <a routerLink="/my-appointments" routerLinkActive="active">My Appointments</a>
+        }
+        
+      </div>
+      <div class="user-info">
+        <button (click)="logout()">Logout</button>
+      </div>
+    </nav>

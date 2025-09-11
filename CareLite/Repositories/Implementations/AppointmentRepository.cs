@@ -53,13 +53,14 @@ namespace CareLite.Repositories.Implementations
                 {
                     AppointmentId = (int)reader["AppointmentId"],
                     PatientId = (int)reader["PatientId"],
+                    PatientName = reader["PatientName"].ToString(),
                     ProviderId = (int)reader["ProviderId"],
                     StartTime = (DateTime)reader["StartTime"],
                     DurationMinutes = (int)reader["DurationMinutes"],
                     Status = reader["Status"].ToString(),
                     CreatedAt = (DateTime)reader["CreatedAt"],
                     UpdatedAt = reader["UpdatedAt"] == DBNull.Value ? null : (DateTime?)reader["UpdatedAt"]
-                });
+                });;
             }
             return appointments;
         }

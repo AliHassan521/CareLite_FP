@@ -150,6 +150,11 @@ namespace CareLite.Repositories.Implementations
                     Email = reader["Email"].ToString(),
                     Phone = reader["Phone"].ToString(),
                     RoleId = (int)reader["RoleId"],
+                    Role = new Role
+                    {
+                        RoleId = (int)reader["RoleId"],
+                        RoleName = reader["RoleName"].ToString()
+                    },
                     IsActive = (bool)reader["IsActive"],
                     CreatedAt = (DateTime)reader["CreatedAt"]
                 });

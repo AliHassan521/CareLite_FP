@@ -4,6 +4,7 @@
 bin/
 obj/
 .vs/
+node_modules/
 # User-specific files
 *.user
 *.suo

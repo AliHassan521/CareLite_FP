@@ -4,17 +4,11 @@
     <h2>Dashboard</h2>
     @if (!role) {
       <div class="error">Unable to determine role. Please sign in again.</div>
-    } @else {
-      <div class="welcome">Welcome, {{ role }}!</div>
     }
-      @if (role === 'Admin') {
-        <div class="info">Manage/search patients & view audit logs.</div>
-      }
-      @if (role === 'Staff') {
-        <div class="info">Manage/search patients only.</div>
-      }
-      @if (role === 'Clinician') {
-        <div class="info">Search patients only.</div>
-      }
+    @if (role) {
+      <div class="welcome">Welcome, <b>{{ userName }}</b>!</div>
+      <div class="info">Your role: <b>{{ role }}</b></div>
+      <div class="info">Use the navigation bar to access Patients, Appointments, Billing, and other features.</div>
+    }
   </main>
 </div>

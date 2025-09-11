@@ -1,6 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { NavbarComponent } from '../shared/navbar.component';
+
+import { NavbarComponent } from '../shared/navbar/navbar.component';
+
+import { TokenService } from '../services/token.service';
+
 
 @Component({
   selector: 'app-dashboard',
@@ -11,27 +15,17 @@ import { NavbarComponent } from '../shared/navbar.component';
 })
 export class DashboardComponent {
   role: string | null = null;
-  loading = true;
+  userName: string | null = null;
+  private router = inject(Router);
+  private tokenService = inject(TokenService);
 
-  constructor(private router: Router) {
-    const token = localStorage.getItem('token');
-    if (!token) {
+  constructor() {
+    const payload = this.tokenService.getPayload();
+    this.role = payload?.role || payload?.['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || null;
+    this.userName = payload?.unique_name || payload?.username || payload?.email || null;
+    if (!this.role) {
       this.router.navigate(['/signin']);
       return;
     }
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      this.role = payload['role'] || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || null;
-      if (!this.role) {
-        // If role is missing, treat as invalid session
-        this.router.navigate(['/signin']);
-        return;
-      }
-    } catch {
-      this.role = null;
-      this.router.navigate(['/signin']);
-      return;
-    }
-    this.loading = false;
   }
 }

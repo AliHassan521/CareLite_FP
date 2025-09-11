@@ -11,17 +11,27 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent),
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['Admin', 'Staff', 'Clinician'] }
   },
   {
     path: 'patients',
     loadComponent: () => import('./patients/patients.component').then(m => m.PatientsComponent),
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['Admin', 'Staff'] }
   },
   {
     path: 'schedule-appointment',
-    loadComponent: () => import('./appointments/schedule-appointment.component').then(m => m.ScheduleAppointmentComponent),
-    canActivate: [AuthGuard]
+    loadComponent: () => import('./appointments/schedule-appointment/schedule-appointment.component').then(m => m.ScheduleAppointmentComponent),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['Admin', 'Staff'] }
   },
+  {
+    path: 'my-appointments',
+    loadComponent: () => import('./appointments/my-appointments/my-appointments.component').then(m => m.MyAppointmentsComponent),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['Clinician'] }
+  },
+  // Add more routes for billing, reports, etc. with appropriate roles as needed
   { path: '**', redirectTo: 'signin' }
 ];

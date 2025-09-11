@@ -4,6 +4,7 @@ namespace CareLite.Models.Domain
     {
         public int AppointmentId { get; set; }
         public int PatientId { get; set; }
+        public string PatientName { get; set; }
         public int ProviderId { get; set; } // UserId of provider (Clinician)
         public DateTime StartTime { get; set; }
         public int DurationMinutes { get; set; }
