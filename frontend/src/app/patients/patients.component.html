@@ -8,11 +8,20 @@
       <h3>Add Patient</h3>
       <form [formGroup]="addPatientForm" (ngSubmit)="addPatient()">
         <input formControlName="fullName" placeholder="Full Name" />
+        <div *ngIf="addPatientForm.controls.fullName.touched && addPatientForm.controls.fullName.invalid" class="error">Full Name is required.</div>
         <input formControlName="email" placeholder="Email" type="email" />
+        <div *ngIf="addPatientForm.controls.email.touched && addPatientForm.controls.email.invalid" class="error">
+          <div *ngIf="addPatientForm.controls.email.errors?.required">Email is required.</div>
+          <div *ngIf="addPatientForm.controls.email.errors?.email">Invalid email format.</div>
+        </div>
         <input formControlName="phone" placeholder="Phone" />
+        <div *ngIf="addPatientForm.controls.phone.touched && addPatientForm.controls.phone.invalid" class="error">Phone is required.</div>
         <input formControlName="dateOfBirth" placeholder="Date of Birth" type="date" />
+        <div *ngIf="addPatientForm.controls.dateOfBirth.touched && addPatientForm.controls.dateOfBirth.invalid" class="error">Date of Birth is required.</div>
         <input formControlName="gender" placeholder="Gender" />
+        <div *ngIf="addPatientForm.controls.gender.touched && addPatientForm.controls.gender.invalid" class="error">Gender is required.</div>
         <input formControlName="address" placeholder="Address" />
+        <div *ngIf="addPatientForm.controls.address.touched && addPatientForm.controls.address.invalid" class="error">Address is required.</div>
         <button type="submit" [disabled]="addPatientLoading || addPatientForm.invalid">
           @if (addPatientLoading) { Adding... } @else { Add Patient }
         </button>

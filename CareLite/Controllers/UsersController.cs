@@ -23,18 +23,31 @@ namespace CareLite.Controllers
         [Authorize(Roles = "Admin,Staff,Clinician")]
         public async Task<IActionResult> GetUsers([FromQuery] string? role = null)
         {
-            // For now, fetch all users and filter by role name in memory
-            var (users, _) = await _userRepository.SearchUsersAsync(null, 1, 1000);
-            if (!string.IsNullOrEmpty(role))
+            var correlationId = Guid.NewGuid();
+            try
             {
-                users = users.Where(u => u.Role != null && u.Role.RoleName == role).ToList();
+                // For now, fetch all users and filter by role name in memory
+                var (users, _) = await _userRepository.SearchUsersAsync(null, 1, 1000);
+                if (!string.IsNullOrEmpty(role))
+                {
+                    users = users.Where(u => u.Role != null && u.Role.RoleName == role).ToList();
+                }
+                Response.Headers.Add("X-Correlation-Id", correlationId.ToString());
+                return Ok(new {
+                    Data = users.Select(u => new {
+                        userId = u.UserId,
+                        fullName = u.FullName,
+                        email = u.Email,
+                        role = u.Role?.RoleName
+                    }),
+                    CorrelationId = correlationId
+                });
             }
-            return Ok(users.Select(u => new {
-                userId = u.UserId,
-                fullName = u.FullName,
-                email = u.Email,
-                role = u.Role?.RoleName
-            }));
+            catch (Exception ex)
+            {
+                Response.Headers.Add("X-Correlation-Id", correlationId.ToString());
+                return StatusCode(500, new { Message = "An error occurred", Details = ex.Message, CorrelationId = correlationId });
+            }
         }
     }
 }

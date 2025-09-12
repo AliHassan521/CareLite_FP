@@ -7,7 +7,9 @@ namespace CareLite.Repositories.Interfaces
 {
     public interface IAppointmentRepository
     {
-        Task<Appointment> CreateAppointmentAsync(Appointment appointment);
-        Task<List<Appointment>> GetProviderAppointmentsAsync(int providerId, DateTime weekStart, DateTime weekEnd);
+    Task<Appointment> CreateAppointmentAsync(Appointment appointment, int createdByUserId);
+    Task<Appointment> UpdateAppointmentAsync(Appointment appointment, int changedByUserId);
+    Task<List<Appointment>> GetProviderAppointmentsAsync(int providerId, DateTime weekStart, DateTime weekEnd);
+    Task<List<AppointmentStatusHistory>> GetAppointmentStatusHistoryAsync(int appointmentId);
     }
 }

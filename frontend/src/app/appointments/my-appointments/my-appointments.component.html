@@ -10,25 +10,14 @@
   <div>No appointments found for this week.</div>
 }
 @if (appointments.length > 0) {
-  <!-- <table>
-    <thead>
-      <tr>
-        <th>Patient</th>
-        <th>Start Time</th>
-        <th>Duration</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (appt of appointments; track appt.appointmentId) {
-        <tr>
-          <td>{{ appt.patientName }}</td>
-          <td>{{ appt.startTime | date:'short' }}</td>
-          <td>{{ appt.durationMinutes }} min</td>
-          <td>{{ appt.status }}</td>
-        </tr>
-      }
-    </tbody>
-  </table> -->
+  <div *ngFor="let appt of appointments; trackBy: trackById" class="appointment-card">
+    <div class="appt-header">
+      <strong>{{ appt.patientName }}</strong> | {{ appt.startTime | date:'short' }} | {{ appt.durationMinutes }} min | Status: {{ appt.status }}
+      <button type="button" (click)="appt.showHistory = !appt.showHistory">{{ appt.showHistory ? 'Hide' : 'Show' }} Status History</button>
+    </div>
+    <div *ngIf="appt.showHistory">
+      <app-appointment-status-history [appointmentId]="appt.appointmentId"></app-appointment-status-history>
+    </div>
+  </div>
   <app-provider-calendar [appointments]="appointments" />
 }

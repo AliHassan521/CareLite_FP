@@ -32,6 +32,12 @@ export const routes: Routes = [
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Clinician'] }
   },
+  {
+    path: 'audit-log',
+    loadComponent: () => import('./audit-log/audit-log.component').then(m => m.AuditLogComponent),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['Admin'] }
+  },
   // Add more routes for billing, reports, etc. with appropriate roles as needed
   { path: '**', redirectTo: 'signin' }
 ];

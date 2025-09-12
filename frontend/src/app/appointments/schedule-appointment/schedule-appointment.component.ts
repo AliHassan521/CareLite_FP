@@ -7,6 +7,8 @@ import { environment } from '../../../environment/environment';
 import { TokenService } from '../../services/token.service';
 import { NavbarComponent } from '../../shared/navbar/navbar.component';
 import { AppointmentValidators } from '../appointment-validators';
+import { BusinessHoursService, BusinessHours } from '../../services/business-hours.service';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-schedule-appointment',
@@ -17,19 +19,22 @@ import { AppointmentValidators } from '../appointment-validators';
 })
 export class ScheduleAppointmentComponent implements OnInit {
   form = inject(FormBuilder).nonNullable.group({
-  patientId: [null, Validators.required],
-  providerId: [null, Validators.required],
-  date: ['', [Validators.required, AppointmentValidators.notPastDate()]],
-  time: [
-    '',
-    [
-      Validators.required,
-      AppointmentValidators.withinBusinessHours(),
-      AppointmentValidators.notInBreakTime()
-    ]
-  ],
-  durationMinutes: [15, Validators.required]
-});
+    patientId: [null, Validators.required],
+    providerId: [null, Validators.required],
+    date: ['', [Validators.required, AppointmentValidators.notPastDate()]],
+    time: [
+      '',
+      [Validators.required]
+    ],
+    durationMinutes: [15, Validators.required]
+  });
+
+  businessHours: BusinessHours = {
+    ClinicStart: '09:00',
+    ClinicEnd: '17:00',
+    BreakStart: '13:00',
+    BreakEnd: '14:00'
+  };
 
   patients: any[] = [];
   providers: any[] = [];
@@ -38,6 +43,7 @@ export class ScheduleAppointmentComponent implements OnInit {
   private messageService = inject(MessageService);
   private router = inject(Router);
   private tokenService = inject(TokenService);
+  private businessHoursService = inject(BusinessHoursService);
   headers: { [header: string]: string } = {};
 
   constructor() {
@@ -46,6 +52,17 @@ export class ScheduleAppointmentComponent implements OnInit {
   }
 
   ngOnInit() {
+    // Fetch business hours and update validators
+    this.businessHoursService.getBusinessHours().pipe(take(1)).subscribe(hours => {
+      this.businessHours = hours;
+      // Update validators for time control
+      this.form.controls.time.setValidators([
+        Validators.required,
+        AppointmentValidators.withinBusinessHours(hours.ClinicStart, hours.ClinicEnd),
+        AppointmentValidators.notInBreakTime(hours.BreakStart, hours.BreakEnd)
+      ]);
+      this.form.controls.time.updateValueAndValidity();
+    });
     // Fetch patients
     this.http.get<any>(`${environment.apiBaseUrl}/patient/search?query=&page=1&pageSize=1000`, { headers: this.headers })
       .subscribe({

@@ -285,3 +285,26 @@ BEGIN
     ORDER BY a.StartTime;
 END
 GO
+
+
+Here is a list of improvements and changes made so far:
+
+Backend Enhancements
+
+Implemented appointment status history tracking (DB, SP, repository, service, controller).
+Added API endpoint to retrieve appointment status history.
+Ensured all endpoints are protected with role-based access.
+Improved error responses to include correlation IDs and root causes.
+Frontend Improvements
+
+Created Angular model and service for appointment status history.
+Added status history display to "My Appointments" with expandable details.
+Improved error handling: UI now shows backend error messages and root causes.
+Added field-level validation to all main forms (schedule appointment, add patient, sign in, register).
+Forms now show specific error messages for each invalid field and prevent submission until all fields are valid.
+Enhanced dropdowns with default "Select" options for better UX.
+Validation & Feedback
+
+All forms provide immediate feedback for missing/invalid fields.
+Users cannot proceed until all required fields are correctly filled.
+If you need a more detailed breakdown or want to track further improvements, let me know!

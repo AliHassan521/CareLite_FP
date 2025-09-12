@@ -20,8 +20,18 @@ namespace CareLite.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var logs = await _auditLogRepository.GetAllAsync();
-            return Ok(logs);
+            var correlationId = Guid.NewGuid();
+            try
+            {
+                var logs = await _auditLogRepository.GetAllAsync();
+                Response.Headers.Add("X-Correlation-Id", correlationId.ToString());
+                return Ok(new { Data = logs, CorrelationId = correlationId });
+            }
+            catch (Exception ex)
+            {
+                Response.Headers.Add("X-Correlation-Id", correlationId.ToString());
+                return StatusCode(500, new { Message = "An error occurred", Details = ex.Message, CorrelationId = correlationId });
+            }
         }
     }
 }
