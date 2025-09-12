@@ -286,25 +286,142 @@ BEGIN
 END
 GO
 
+-- Drop existing SP if exists
+IF OBJECT_ID('sp_UpdateAppointment', 'P') IS NOT NULL
+    DROP PROCEDURE sp_UpdateAppointment;
+GO
 
-Here is a list of improvements and changes made so far:
+CREATE PROCEDURE sp_UpdateAppointment
+    @AppointmentId INT,
+    @PatientId INT,
+    @ProviderId INT,
+    @StartTime DATETIME,
+    @DurationMinutes INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRANSACTION;
+    BEGIN TRY
+        -- Enforce allowed durations
+        IF @DurationMinutes NOT IN (15, 30, 60)
+        BEGIN
+            RAISERROR('Invalid duration. Only 15, 30, or 60 minutes allowed.', 16, 1);
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
 
-Backend Enhancements
+        -- Enforce business hours (example: 08:00 to 18:00)
+        IF DATEPART(HOUR, @StartTime) < 8 OR DATEPART(HOUR, DATEADD(MINUTE, @DurationMinutes, @StartTime)) > 18
+        BEGIN
+            RAISERROR('Appointment must be within business hours (08:00-18:00).', 16, 1);
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
 
-Implemented appointment status history tracking (DB, SP, repository, service, controller).
-Added API endpoint to retrieve appointment status history.
-Ensured all endpoints are protected with role-based access.
-Improved error responses to include correlation IDs and root causes.
-Frontend Improvements
+        -- Prevent double-booking for provider (exclude current appointment)
+        IF EXISTS (
+            SELECT 1 FROM Appointments
+            WHERE ProviderId = @ProviderId
+              AND Status = 'Scheduled'
+              AND AppointmentId <> @AppointmentId
+              AND (
+                    (@StartTime >= StartTime AND @StartTime < DATEADD(MINUTE, DurationMinutes, StartTime))
+                 OR (DATEADD(MINUTE, @DurationMinutes, @StartTime) > StartTime AND DATEADD(MINUTE, @DurationMinutes, @StartTime) <= DATEADD(MINUTE, DurationMinutes, StartTime))
+                 OR (@StartTime <= StartTime AND DATEADD(MINUTE, @DurationMinutes, @StartTime) >= DATEADD(MINUTE, DurationMinutes, StartTime))
+              )
+        )
+        BEGIN
+            RAISERROR('Provider is already booked for this time slot.', 16, 1);
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
 
-Created Angular model and service for appointment status history.
-Added status history display to "My Appointments" with expandable details.
-Improved error handling: UI now shows backend error messages and root causes.
-Added field-level validation to all main forms (schedule appointment, add patient, sign in, register).
-Forms now show specific error messages for each invalid field and prevent submission until all fields are valid.
-Enhanced dropdowns with default "Select" options for better UX.
-Validation & Feedback
+        UPDATE Appointments
+        SET PatientId = @PatientId,
+            ProviderId = @ProviderId,
+            StartTime = @StartTime,
+            DurationMinutes = @DurationMinutes,
+            UpdatedAt = GETUTCDATE()
+        WHERE AppointmentId = @AppointmentId;
 
-All forms provide immediate feedback for missing/invalid fields.
-Users cannot proceed until all required fields are correctly filled.
-If you need a more detailed breakdown or want to track further improvements, let me know!
+        -- Return updated appointment
+        SELECT * FROM Appointments WHERE AppointmentId = @AppointmentId;
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH
+END
+GO
+
+-- Drop existing SP if exists
+IF OBJECT_ID('sp_GetBusinessHours', 'P') IS NOT NULL
+    DROP PROCEDURE sp_GetBusinessHours;
+GO
+
+CREATE PROCEDURE sp_GetBusinessHours
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT SettingKey, SettingValue FROM BusinessSettings WHERE SettingKey IN ('BusinessStart', 'BusinessEnd');
+END
+GO
+
+
+-- Add status history on appointment creation
+ALTER PROCEDURE sp_CreateAppointment
+    @PatientId INT,
+    @ProviderId INT,
+    @StartTime DATETIME,
+    @DurationMinutes INT,
+    @CreatedBy INT = NULL, -- UserId
+    @AppointmentId INT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO Appointments (PatientId, ProviderId, StartTime, DurationMinutes, Status, CreatedAt)
+    VALUES (@PatientId, @ProviderId, @StartTime, @DurationMinutes, 'Scheduled', GETUTCDATE());
+
+    SET @AppointmentId = SCOPE_IDENTITY();
+
+    -- Insert status history
+    INSERT INTO AppointmentStatusHistory (AppointmentId, OldStatus, NewStatus, ChangedAt, ChangedBy)
+    VALUES (@AppointmentId, NULL, 'Scheduled', GETUTCDATE(), @CreatedBy);
+END
+GO
+
+-- Add status history on appointment update
+ALTER PROCEDURE sp_UpdateAppointment
+    @AppointmentId INT,
+    @PatientId INT,
+    @ProviderId INT,
+    @StartTime DATETIME,
+    @DurationMinutes INT,
+    @NewStatus VARCHAR(20),
+    @ChangedBy INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @OldStatus VARCHAR(20);
+    SELECT @OldStatus = Status FROM Appointments WHERE AppointmentId = @AppointmentId;
+
+    UPDATE Appointments
+    SET PatientId = @PatientId,
+        ProviderId = @ProviderId,
+        StartTime = @StartTime,
+        DurationMinutes = @DurationMinutes,
+        Status = @NewStatus,
+        UpdatedAt = GETUTCDATE()
+    WHERE AppointmentId = @AppointmentId;
+
+    -- Insert status history
+    INSERT INTO AppointmentStatusHistory (AppointmentId, OldStatus, NewStatus, ChangedAt, ChangedBy)
+    VALUES (@AppointmentId, @OldStatus, @NewStatus, GETUTCDATE(), @ChangedBy);
+
+    -- Return updated row
+    SELECT * FROM Appointments WHERE AppointmentId = @AppointmentId;
+END
+GO

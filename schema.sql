@@ -92,6 +92,40 @@ CREATE TABLE Appointments (
 );
 GO
 
+-- Drop existing table if exists
+IF OBJECT_ID('BusinessSettings', 'U') IS NOT NULL
+    DROP TABLE BusinessSettings;
+GO
+
+CREATE TABLE BusinessSettings (
+    SettingId INT IDENTITY(1,1) PRIMARY KEY,
+    SettingKey VARCHAR(100) NOT NULL UNIQUE,
+    SettingValue VARCHAR(100) NOT NULL
+);
+GO
+
+-- Insert default business hours (09:00-17:00)
+INSERT INTO BusinessSettings (SettingKey, SettingValue) VALUES ('BusinessStart', '09:00');
+INSERT INTO BusinessSettings (SettingKey, SettingValue) VALUES ('BusinessEnd', '17:00');
+GO
+
+-- Drop table if exists
+IF OBJECT_ID('AppointmentStatusHistory', 'U') IS NOT NULL
+    DROP TABLE AppointmentStatusHistory;
+GO
+
+CREATE TABLE AppointmentStatusHistory (
+    HistoryId INT IDENTITY(1,1) PRIMARY KEY,
+    AppointmentId INT NOT NULL,
+    OldStatus VARCHAR(20) NULL,
+    NewStatus VARCHAR(20) NOT NULL,
+    ChangedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
+    ChangedBy INT NULL, -- UserId
+    CONSTRAINT FK_History_Appointment FOREIGN KEY (AppointmentId) REFERENCES Appointments(AppointmentId),
+    CONSTRAINT FK_History_User FOREIGN KEY (ChangedBy) REFERENCES Users(UserId)
+);
+GO
+
 -- Dummy Patients
 INSERT INTO Patients (FullName, Email, Phone, DateOfBirth, Gender, Address)
 VALUES
