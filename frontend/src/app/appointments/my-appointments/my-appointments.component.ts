@@ -47,7 +47,13 @@ export class MyAppointmentsComponent implements OnInit {
     if (token) headers['Authorization'] = `Bearer ${token}`;
     this.appointmentService.getProviderAppointments(this.providerId, weekStart, weekEnd, headers).subscribe({
       next: (appts) => {
-        this.appointments = appts.map(a => ({ ...a, patientName: a.patientName || a.PatientName }));
+        let arr: any[] = [];
+        if (Array.isArray(appts)) {
+          arr = appts;
+        } else if (appts && Array.isArray((appts as any).data)) {
+          arr = (appts as any).data;
+        }
+        this.appointments = arr.map(a => ({ ...a, patientName: a.patientName || a.PatientName, showHistory: false }));
         this.loading = false;
       },
       error: (err) => {

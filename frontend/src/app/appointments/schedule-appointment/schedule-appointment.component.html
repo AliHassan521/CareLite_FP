@@ -9,7 +9,9 @@
       <option [value]="patient.patientId">{{ patient.fullName }}</option>
       }
     </select>
-    <div *ngIf="form.controls.patientId.touched && form.controls.patientId.invalid" class="error">Patient is required.</div>
+    @if (form.controls['patientId'].touched && form.controls['patientId'].invalid) {
+      <div class="error">Patient is required.</div>
+    }
     <label>Provider</label>
     <select formControlName="providerId">
       <option value="">Select provider</option>
@@ -17,23 +19,30 @@
       <option [value]="provider.userId">{{ provider.fullName }}</option>
       }
     </select>
-    <div *ngIf="form.controls.providerId.touched && form.controls.providerId.invalid" class="error">Provider is required.</div>
+    @if (form.controls['providerId'].touched && form.controls['providerId'].invalid) {
+      <div class="error">Provider is required.</div>
+    }
     <!-- <label>Date</label>
     <input type="date" formControlName="date" />
     <label>Time</label>
     <input type="time" formControlName="time" /> -->
+    <label>Date</label>
     <input type="date" formControlName="date" />
-    <div *ngIf="form.controls.date.touched && form.controls.date.invalid">
-      <div *ngIf="form.controls.date.errors?.required" class="error">Date is required.</div>
-      <div *ngIf="form.controls.date.errors?.pastDate" class="error">Date cannot be in the past.</div>
-    </div>
-
+    @if (form.controls['date'].touched && form.controls['date'].invalid) {
+      <div>
+        @if (form.controls['date'].errors?.['required']) { <div class="error">Date is required.</div> }
+        @if (form.controls['date'].errors?.['pastDate']) { <div class="error">Date cannot be in the past.</div> }
+      </div>
+    }
+    <label>Time</label>
     <input type="time" formControlName="time" />
-    <div *ngIf="form.controls.time.touched && form.controls.time.invalid">
-      <div *ngIf="form.controls.time.errors?.required" class="error">Time is required.</div>
-      <div *ngIf="form.controls.time.errors?.outsideBusinessHours" class="error">Time must be between {{ businessHours.ClinicStart }} and {{ businessHours.ClinicEnd }}.</div>
-      <div *ngIf="form.controls.time.errors?.inBreakTime" class="error">Cannot schedule during break ({{ businessHours.BreakStart }}–{{ businessHours.BreakEnd }}).</div>
-    </div>
+    @if (form.controls['time'].touched && form.controls['time'].invalid) {
+      <div>
+        @if (form.controls['time'].errors?.['required']) { <div class="error">Time is required.</div> }
+        @if (form.controls['time'].errors?.['outsideBusinessHours']) { <div class="error">Time must be between {{ businessHours.ClinicStart }} and {{ businessHours.ClinicEnd }}.</div> }
+        @if (form.controls['time'].errors?.['inBreakTime']) { <div class="error">Cannot schedule during break ({{ businessHours.BreakStart }}–{{ businessHours.BreakEnd }}).</div> }
+      </div>
+    }
 
     <label>Duration</label>
     <select formControlName="durationMinutes">
@@ -42,7 +51,9 @@
       <option [value]="30">30 minutes</option>
       <option [value]="60">60 minutes</option>
     </select>
-    <div *ngIf="form.controls.durationMinutes.touched && form.controls.durationMinutes.invalid" class="error">Duration is required.</div>
+    @if (form.controls['durationMinutes'].touched && form.controls['durationMinutes'].invalid) {
+      <div class="error">Duration is required.</div>
+    }
     <button type="submit" [disabled]="form.invalid || loading">
       @if (loading) { Scheduling... } @else { Schedule }
     </button>

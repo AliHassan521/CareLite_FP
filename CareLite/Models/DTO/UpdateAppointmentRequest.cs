@@ -8,6 +8,7 @@ namespace CareLite.Models.DTO
         public int PatientId { get; set; }
         public int ProviderId { get; set; }
         public DateTime StartTime { get; set; }
+        public string NewStatus { get; set; }
         public int DurationMinutes { get; set; }
     }
 }

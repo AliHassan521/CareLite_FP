@@ -144,4 +144,4 @@ VALUES
 ('clinician1', '$2a$11$Qe6Qw6Qw6Qw6Qw6Qw6Qw6uQw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6', 'Dr. Alice Clinician', 'clinician1@clinic.com', '5553334444', 3, 1, GETUTCDATE()),
 ('clinician2', '$2a$11$Qe6Qw6Qw6Qw6Qw6Qw6Qw6uQw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6', 'Dr. Bob Clinician', 'clinician2@clinic.com', '5554445555', 3, 1, GETUTCDATE());
 
-select * from Patients
+select * from AuditLogs

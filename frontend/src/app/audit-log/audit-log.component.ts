@@ -2,11 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environment/environment';
 
+import { DatePipe } from '@angular/common';
+import { NavbarComponent } from "../shared/navbar/navbar.component";
 @Component({
   selector: 'app-audit-log',
   standalone: true,
   templateUrl: './audit-log.component.html',
-  styleUrls: ['./audit-log.component.scss']
+  styleUrls: ['./audit-log.component.scss'],
+  imports: [DatePipe, NavbarComponent]
 })
 export class AuditLogComponent implements OnInit {
   logs: any[] = [];

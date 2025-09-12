@@ -99,7 +99,8 @@ namespace CareLite.Services.Implementations
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, user.Role.RoleName)
+                new Claim(ClaimTypes.Role, user.Role.RoleName),
+                new Claim(ClaimTypes.GivenName, user.FullName)
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor

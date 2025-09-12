@@ -4,4 +4,5 @@ export interface Appointment {
   startTime: string;
   durationMinutes: number;
   status: string;
+  showHistory?: boolean;
 }

@@ -77,9 +77,13 @@ export class ScheduleAppointmentComponent implements OnInit {
         }
       });
     // Fetch providers (users with role Clinician)
-    this.http.get<any[]>(`${environment.apiBaseUrl}/users?role=Clinician`, { headers: this.headers })
+    this.http.get<any>(`${environment.apiBaseUrl}/users?role=Clinician`, { headers: this.headers })
       .subscribe({
-        next: res => this.providers = res,
+        
+        next: res => {
+          this.providers = res.data || [];
+          //console.log('Providers loaded:', this.providers);
+        },
         error: err => {
           this.messageService.showMessage({ type: 'error', text: 'Failed to load providers.' }, 4000);
         }
@@ -93,10 +97,10 @@ export class ScheduleAppointmentComponent implements OnInit {
     // Send local time string to backend (no UTC conversion)
     const startTime = date + 'T' + time; // e.g., '2025-09-12T13:00'
     this.http.post(`${environment.apiBaseUrl}/appointment`, {
-      patientId,
-      providerId,
-      startTime,
-      durationMinutes
+      PatientId : Number(patientId),
+      ProviderId : Number(providerId),
+      StartTime: startTime,
+      DurationMinutes : Number(durationMinutes)
     }, { headers: this.headers }).subscribe({
       next: () => {
         this.messageService.showMessage({ type: 'success', text: 'Appointment scheduled!' }, 4000);

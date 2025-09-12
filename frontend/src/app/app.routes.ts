@@ -33,6 +33,18 @@ export const routes: Routes = [
     data: { roles: ['Clinician'] }
   },
   {
+    path: 'provider-calendar',
+    loadComponent: () => import('./appointments/provider-calendar/provider-calendar.component').then(m => m.ProviderCalendarComponent),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['Admin', 'Staff', 'Clinician'] }
+  },
+  {
+    path: 'appointment-status-history/:appointmentId',
+    loadComponent: () => import('./appointments/appointment-status/appointment-status-history.component').then(m => m.AppointmentStatusHistoryComponent),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['Admin', 'Staff', 'Clinician'] }
+  },
+  {
     path: 'audit-log',
     loadComponent: () => import('./audit-log/audit-log.component').then(m => m.AuditLogComponent),
     canActivate: [AuthGuard, RoleGuard],

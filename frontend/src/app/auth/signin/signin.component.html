@@ -4,15 +4,19 @@
     <div class="form-group">
       <label>Username</label>
   <input formControlName="username" type="text" />
-  <div *ngIf="signinForm.controls.username.touched && signinForm.controls.username.invalid" class="error">Username is required.</div>
+  @if (signinForm.controls['username'].touched && signinForm.controls['username'].invalid) {
+    <div class="error">Username is required.</div>
+  }
     </div>
     <div class="form-group">
       <label>Password</label>
       <input formControlName="password" type="password" />
-      <div *ngIf="signinForm.controls.password.touched && signinForm.controls.password.invalid" class="error">
-        <div *ngIf="signinForm.controls.password.errors?.required">Password is required.</div>
-        <div *ngIf="signinForm.controls.password.errors?.minlength">Password must be at least 6 characters.</div>
-      </div>
+      @if (signinForm.controls['password'].touched && signinForm.controls['password'].invalid) {
+        <div class="error">
+          @if (signinForm.controls['password'].errors?.['required']) { Password is required. }
+          @if (signinForm.controls['password'].errors?.['minlength']) { Password must be at least 6 characters. }
+        </div>
+      }
     </div>
     <button type="submit" [disabled]="loading">
       @if (loading) { <span class="spinner"></span> } @else { Sign In }

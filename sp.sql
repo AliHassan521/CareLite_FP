@@ -425,3 +425,19 @@ BEGIN
     SELECT * FROM Appointments WHERE AppointmentId = @AppointmentId;
 END
 GO
+
+IF OBJECT_ID('sp_GetAppointmentStatusHistory', 'P') IS NOT NULL
+    DROP PROCEDURE sp_GetAppointmentStatusHistory;
+GO
+
+CREATE PROCEDURE sp_GetAppointmentStatusHistory
+    @AppointmentId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT * 
+    FROM AppointmentStatusHistory
+    WHERE AppointmentId = @AppointmentId
+    ORDER BY ChangedAt ASC;
+END
+GO

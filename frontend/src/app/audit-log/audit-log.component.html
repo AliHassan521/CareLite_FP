@@ -1,3 +1,4 @@
+<app-navbar />
 <div class="audit-log-container">
   <h2>Audit Log</h2>
   @if (loading) {
@@ -11,7 +12,6 @@
       <thead>
         <tr>
           <th>Time</th>
-          <th>User</th>
           <th>Action</th>
           <th>Description</th>
           <th>Correlation ID</th>
@@ -21,7 +21,7 @@
         @for (log of logs; track log) {
           <tr>
             <td>{{ log.createdAt | date:'short' }}</td>
-            <td>{{ log.user?.username || 'N/A' }}</td>
+            <!-- <td>{{ log.user?.username || 'N/A' }}</td> -->
             <td>{{ log.action }}</td>
             <td>{{ log.description }}</td>
             <td>{{ log.correlationId }}</td>

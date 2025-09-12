@@ -4,33 +4,43 @@
     <div class="form-group">
       <label>Username</label>
   <input formControlName="username" type="text" />
-  <div *ngIf="registerForm.controls.username.touched && registerForm.controls.username.invalid" class="error">Username is required.</div>
+  @if (registerForm.controls['username'].touched && registerForm.controls['username'].invalid) {
+    <div class="error">Username is required.</div>
+  }
     </div>
     <div class="form-group">
       <label>Full Name</label>
   <input formControlName="fullName" type="text" />
-  <div *ngIf="registerForm.controls.fullName.touched && registerForm.controls.fullName.invalid" class="error">Full Name is required.</div>
+  @if (registerForm.controls['fullName'].touched && registerForm.controls['fullName'].invalid) {
+    <div class="error">Full Name is required.</div>
+  }
     </div>
     <div class="form-group">
       <label>Email</label>
       <input formControlName="email" type="email" />
-      <div *ngIf="registerForm.controls.email.touched && registerForm.controls.email.invalid" class="error">
-        <div *ngIf="registerForm.controls.email.errors?.required">Email is required.</div>
-        <div *ngIf="registerForm.controls.email.errors?.email">Invalid email format.</div>
-      </div>
+      @if (registerForm.controls['email'].touched && registerForm.controls['email'].invalid) {
+        <div class="error">
+          @if (registerForm.controls['email'].errors?.['required']) { Email is required. }
+          @if (registerForm.controls['email'].errors?.['email']) { Invalid email format. }
+        </div>
+      }
     </div>
     <div class="form-group">
       <label>Phone</label>
   <input formControlName="phone" type="text" />
-  <div *ngIf="registerForm.controls.phone.touched && registerForm.controls.phone.invalid" class="error">Phone is required.</div>
+  @if (registerForm.controls['phone'].touched && registerForm.controls['phone'].invalid) {
+    <div class="error">Phone is required.</div>
+  }
     </div>
     <div class="form-group">
       <label>Password</label>
       <input formControlName="password" type="password" />
-      <div *ngIf="registerForm.controls.password.touched && registerForm.controls.password.invalid" class="error">
-        <div *ngIf="registerForm.controls.password.errors?.required">Password is required.</div>
-        <div *ngIf="registerForm.controls.password.errors?.minlength">Password must be at least 6 characters.</div>
-      </div>
+      @if (registerForm.controls['password'].touched && registerForm.controls['password'].invalid) {
+        <div class="error">
+          @if (registerForm.controls['password'].errors?.['required']) { Password is required. }
+          @if (registerForm.controls['password'].errors?.['minlength']) { Password must be at least 6 characters. }
+        </div>
+      }
     </div>
     <div class="form-group">
       <label>Role</label>
@@ -38,7 +48,9 @@
         <option value="">Select role</option>
         @for (role of roles; track role) { <option [value]="role">{{ role }}</option> }
       </select>
-      <div *ngIf="registerForm.controls.roleName.touched && registerForm.controls.roleName.invalid" class="error">Role is required.</div>
+      @if (registerForm.controls['roleName'].touched && registerForm.controls['roleName'].invalid) {
+        <div class="error">Role is required.</div>
+      }
     </div>
     <button type="submit" [disabled]="loading">
       @if (loading) { <span class="spinner"></span> } @else { Register }

@@ -1,4 +1,4 @@
-export interface AppointmentStatusHistory {
+export interface AppointmentStatusHistoryModal {
   historyId: number;
   appointmentId: number;
   oldStatus: string | null;

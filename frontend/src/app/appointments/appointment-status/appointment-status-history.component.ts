@@ -1,8 +1,7 @@
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Appointment } from '../appointment.model';
-import { AppointmentStatusHistory } from './appointment-status-history.model';
-import { AppointmentStatusHistoryService } from '../../services/appointment-status-history.service';
+import { AppointmentStatusHistoryModal } from './appointment-status-history.model';
+import { AppointmentStatusHistoryService } from '../appointment-status-history.service';
 
 @Component({
   selector: 'app-appointment-status-history',
@@ -13,9 +12,10 @@ import { AppointmentStatusHistoryService } from '../../services/appointment-stat
 })
 export class AppointmentStatusHistoryComponent implements OnInit {
   @Input() appointmentId!: number;
-  history: AppointmentStatusHistory[] = [];
+  history: AppointmentStatusHistoryModal[] = [];
   loading = true;
   error: string | null = null;
+
   private historyService = inject(AppointmentStatusHistoryService);
 
   ngOnInit() {
@@ -24,21 +24,14 @@ export class AppointmentStatusHistoryComponent implements OnInit {
       this.loading = false;
       return;
     }
+
     this.historyService.getStatusHistory(this.appointmentId).subscribe({
-      next: (data) => {
+      next: data => {
         this.history = data;
         this.loading = false;
       },
-      error: (err) => {
-        let message = 'Failed to load status history.';
-        if (err.error?.Message) {
-          message += ' Reason: ' + err.error.Message;
-        } else if (err.error) {
-          message += ' Response: ' + JSON.stringify(err.error);
-        } else if (err.message) {
-          message += ' Error: ' + err.message;
-        }
-        this.error = message;
+      error: err => {
+        this.error = err.error?.Message || 'Failed to load status history.';
         this.loading = false;
       }
     });

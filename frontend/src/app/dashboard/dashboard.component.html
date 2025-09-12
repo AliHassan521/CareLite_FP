@@ -6,9 +6,15 @@
       <div class="error">Unable to determine role. Please sign in again.</div>
     }
     @if (role) {
-      <div class="welcome">Welcome, <b>{{ userName }}</b>!</div>
+      <!-- <div class="welcome">Welcome, <b>{{ userName }}</b>!</div> -->
+       <div class="welcome">Welcome, <b>{{ fullName }}</b>!</div>
       <div class="info">Your role: <b>{{ role }}</b></div>
       <div class="info">Use the navigation bar to access Patients, Appointments, Billing, and other features.</div>
+      @if (role === 'Admin') {
+        <div class="dashboard-links">
+          <a routerLink="/audit-log" class="dashboard-link">View Audit Log</a>
+        </div>
+      }
     }
   </main>
 </div>
