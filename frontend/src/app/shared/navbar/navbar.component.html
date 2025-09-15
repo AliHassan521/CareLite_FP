@@ -1,23 +1,38 @@
 <nav class="navbar">
-      <div class="brand" (click)="goTo('/dashboard')" style="cursor:pointer; font-weight:600;">CareLite</div>
-      <div class="links">
-        <!-- @if (role === 'Admin' || role === 'Staff' || role === 'Clinician') {
-          <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-        } -->
-        @if (role === 'Admin' || role === 'Staff') {
-          <a routerLink="/patients" routerLinkActive="active">Patients</a>
-          <a routerLink="/schedule-appointment" routerLinkActive="active">Schedule Appointment</a>
-          <!-- <a routerLink="/provider-calendar" routerLinkActive="active">Provider Calendar</a> -->
-        }
-        @if (role === 'Admin') {
-          <a routerLink="/audit-log" routerLinkActive="active">Audit Log</a>
-        }
-        @if (role === 'Clinician') {
-          <a routerLink="/my-appointments" routerLinkActive="active">My Appointments</a>
-          <!-- <a routerLink="/provider-calendar" routerLinkActive="active">Provider Calendar</a> -->
-        }
-      </div>
-      <div class="user-info">
-        <button (click)="logout()">Logout</button>
-      </div>
-    </nav>
+  <div class="brand" (click)="goTo('/dashboard')" style="cursor:pointer; font-weight:600;">CareLite</div>
+  <div class="links">
+    <!-- Admin Links -->
+    @if (role === 'Admin') {
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+  <a routerLink="/patients" routerLinkActive="active">Patients</a>
+  <a routerLink="/appointments" routerLinkActive="active">All Appointments</a>
+      <a routerLink="/schedule-appointment" routerLinkActive="active">Schedule Appointment</a>
+      <a routerLink="/provider-calendar" routerLinkActive="active">Provider Calendar</a>
+      <a routerLink="/audit-log" routerLinkActive="active">Audit Log</a>
+      <a routerLink="/billing" routerLinkActive="active">Billing</a>
+      <a routerLink="/payments" routerLinkActive="active">Payments</a>
+      <a routerLink="/reports" routerLinkActive="active">Reports</a>
+      <a routerLink="/settings" routerLinkActive="active">Settings</a>
+    }
+    <!-- Staff Links -->
+    @if (role === 'Staff') {
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+  <a routerLink="/patients" routerLinkActive="active">Patients</a>
+  <a routerLink="/appointments" routerLinkActive="active">All Appointments</a>
+      <a routerLink="/schedule-appointment" routerLinkActive="active">Schedule Appointment</a>
+      <a routerLink="/provider-calendar" routerLinkActive="active">Provider Calendar</a>
+      <a routerLink="/billing" routerLinkActive="active">Billing</a>
+      <a routerLink="/payments" routerLinkActive="active">Payments</a>
+      <a routerLink="/reports" routerLinkActive="active">Reports</a>
+    }
+    <!-- Clinician Links -->
+    @if (role === 'Clinician') {
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/my-appointments" routerLinkActive="active">My Appointments</a>
+      <a routerLink="/provider-calendar" routerLinkActive="active">Provider Calendar</a>
+    }
+  </div>
+  <div class="user-info">
+    <button (click)="logout()">Logout</button>
+  </div>
+</nav>

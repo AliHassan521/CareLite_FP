@@ -1,3 +1,50 @@
+.card {
+	background: #fff;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+	padding: 2rem 2.5rem 1.5rem 2.5rem;
+	margin: 2rem auto;
+	max-width: 500px;
+}
+
+.modern-btn {
+	background: #1976d2;
+	color: #fff;
+	border: none;
+	border-radius: 4px;
+	padding: 0.5rem 1.2rem;
+	font-size: 1rem;
+	cursor: pointer;
+	transition: background 0.2s;
+}
+.modern-btn:disabled {
+	background: #b0b0b0;
+	cursor: not-allowed;
+}
+.modern-btn:not(:disabled):hover {
+	background: #1565c0;
+}
+
+.appointment-container label {
+	font-weight: 500;
+	margin-top: 1rem;
+	display: block;
+}
+.appointment-container select,
+.appointment-container input[type="date"],
+.appointment-container input[type="time"] {
+	width: 100%;
+	padding: 0.4rem 0.8rem;
+	border-radius: 4px;
+	border: 1px solid #ccc;
+	font-size: 1rem;
+	margin-bottom: 0.5rem;
+}
+.error {
+	color: #d32f2f;
+	font-size: 0.95rem;
+	margin-bottom: 0.5rem;
+}
 .appointment-container { max-width: 400px; margin: 2rem auto; padding: 2rem; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px #e0e3ea; }
 label { display: block; margin-top: 1rem; }
 select, input { width: 100%; margin-bottom: 1rem; padding: 0.5rem; }

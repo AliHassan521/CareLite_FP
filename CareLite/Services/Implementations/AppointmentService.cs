@@ -1,3 +1,4 @@
+        
 using CareLite.Models.Domain;
 using CareLite.Repositories.Interfaces;
 using CareLite.Services.Interfaces;
@@ -32,14 +33,15 @@ namespace CareLite.Services.Implementations
             return await _repo.GetProviderAppointmentsAsync(providerId, weekStart, weekEnd);
         }
 
-        public async Task<List<AppointmentStatusHistory>> GetAppointmentStatusHistoryAsync(int appointmentId)
-        {
-            return await _repo.GetAppointmentStatusHistoryAsync(appointmentId);
-        }
 
         public async Task<Appointment> GetOverlappingAppointmentAsync(int providerId, DateTime startTime, int durationMinutes, int? excludeAppointmentId = null)
         {
             return await _repo.GetOverlappingAppointmentAsync(providerId, startTime, durationMinutes, excludeAppointmentId);
+        }
+
+        public async Task<List<Appointment>> GetAllAppointmentsAsync()
+        {
+            return await _repo.GetAllAppointmentsAsync();
         }
     }
 }

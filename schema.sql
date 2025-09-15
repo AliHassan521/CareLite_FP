@@ -109,22 +109,18 @@ INSERT INTO BusinessSettings (SettingKey, SettingValue) VALUES ('BusinessStart',
 INSERT INTO BusinessSettings (SettingKey, SettingValue) VALUES ('BusinessEnd', '17:00');
 GO
 
--- Drop table if exists
-IF OBJECT_ID('AppointmentStatusHistory', 'U') IS NOT NULL
-    DROP TABLE AppointmentStatusHistory;
-GO
 
-CREATE TABLE AppointmentStatusHistory (
-    HistoryId INT IDENTITY(1,1) PRIMARY KEY,
+CREATE TABLE Visit (
+    VisitId INT IDENTITY(1,1) PRIMARY KEY,
     AppointmentId INT NOT NULL,
-    OldStatus VARCHAR(20) NULL,
-    NewStatus VARCHAR(20) NOT NULL,
-    ChangedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
-    ChangedBy INT NULL, -- UserId
-    CONSTRAINT FK_History_Appointment FOREIGN KEY (AppointmentId) REFERENCES Appointments(AppointmentId),
-    CONSTRAINT FK_History_User FOREIGN KEY (ChangedBy) REFERENCES Users(UserId)
+    ClinicianId INT NOT NULL,
+    Notes VARCHAR(MAX) NULL,
+    CreatedAt DATETIME NOT NULL DEFAULT GETDATE(),
+    UpdatedAt DATETIME NULL,
+    IsFinalized BIT NOT NULL DEFAULT 0,
+    CONSTRAINT FK_Visit_Appointment FOREIGN KEY (AppointmentId) REFERENCES Appointments(AppointmentId),
+    CONSTRAINT FK_Visit_Clinician FOREIGN KEY (ClinicianId) REFERENCES Users(UserId)
 );
-GO
 
 -- Dummy Patients
 INSERT INTO Patients (FullName, Email, Phone, DateOfBirth, Gender, Address)
@@ -144,4 +140,6 @@ VALUES
 ('clinician1', '$2a$11$Qe6Qw6Qw6Qw6Qw6Qw6Qw6uQw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6', 'Dr. Alice Clinician', 'clinician1@clinic.com', '5553334444', 3, 1, GETUTCDATE()),
 ('clinician2', '$2a$11$Qe6Qw6Qw6Qw6Qw6Qw6Qw6uQw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6Qw6', 'Dr. Bob Clinician', 'clinician2@clinic.com', '5554445555', 3, 1, GETUTCDATE());
 
-select * from AuditLogs
+select * from Visit
+
+SELECT UserId, Username, RoleId FROM Users WHERE RoleId = 3

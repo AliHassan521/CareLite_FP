@@ -392,6 +392,24 @@ BEGIN
 END
 GO
 
+IF OBJECT_ID('sp_GetAllAppointments', 'P') IS NOT NULL
+    DROP PROCEDURE sp_GetAllAppointments;
+GO
+
+CREATE PROCEDURE sp_GetAllAppointments
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT a.AppointmentId, a.PatientId, p.FullName AS PatientName, a.ProviderId, u.FullName AS ProviderName, a.StartTime, a.DurationMinutes, a.Status, a.CreatedAt, a.UpdatedAt
+    FROM Appointments a
+    LEFT JOIN Patients p ON a.PatientId = p.PatientId
+    LEFT JOIN Users u ON a.ProviderId = u.UserId
+    ORDER BY a.StartTime DESC;
+END
+GO
+
+
+
 -- Add status history on appointment update
 ALTER PROCEDURE sp_UpdateAppointment
     @AppointmentId INT,
@@ -426,18 +444,97 @@ BEGIN
 END
 GO
 
-IF OBJECT_ID('sp_GetAppointmentStatusHistory', 'P') IS NOT NULL
-    DROP PROCEDURE sp_GetAppointmentStatusHistory;
+-- Drop if exists
+IF OBJECT_ID('sp_GetOverlappingAppointment', 'P') IS NOT NULL
+    DROP PROCEDURE sp_GetOverlappingAppointment;
 GO
 
-CREATE PROCEDURE sp_GetAppointmentStatusHistory
+CREATE PROCEDURE sp_GetOverlappingAppointment
+    @ProviderId INT,
+    @StartTime DATETIME,
+    @DurationMinutes INT,
+    @ExcludeAppointmentId INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT TOP 1 * FROM Appointments
+    WHERE ProviderId = @ProviderId
+      AND Status = 'Scheduled'
+      AND (
+            (@StartTime < DATEADD(minute, DurationMinutes, StartTime) AND DATEADD(minute, @DurationMinutes, @StartTime) > StartTime)
+          )
+      AND (@ExcludeAppointmentId IS NULL OR AppointmentId <> @ExcludeAppointmentId)
+    ORDER BY StartTime;
+END
+GO
+
+IF OBJECT_ID('sp_CreateVisit', 'P') IS NOT NULL
+    DROP PROCEDURE sp_CreateVisit;
+GO
+
+CREATE PROCEDURE sp_CreateVisit
+    @AppointmentId INT,
+    @ClinicianId INT,
+    @Notes NVARCHAR(MAX)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Check appointment is complete
+    IF NOT EXISTS (
+        SELECT 1 FROM Appointments
+        WHERE AppointmentId = @AppointmentId AND Status = 'Completed'
+    )
+    BEGIN
+        RAISERROR('Appointment must be marked as completed before creating a visit.', 16, 1);
+        RETURN;
+    END
+
+    -- Check no visit exists for this appointment
+    IF EXISTS (
+        SELECT 1 FROM Visit WHERE AppointmentId = @AppointmentId
+    )
+    BEGIN
+        RAISERROR('A visit already exists for this appointment.', 16, 1);
+        RETURN;
+    END
+
+    INSERT INTO Visit (AppointmentId, ClinicianId, Notes, CreatedAt, IsFinalized)
+    VALUES (@AppointmentId, @ClinicianId, @Notes, GETDATE(), 0);
+
+    SELECT * FROM Visit WHERE VisitId = SCOPE_IDENTITY();
+END
+Go
+
+CREATE PROCEDURE sp_GetVisitByAppointment
     @AppointmentId INT
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT * 
-    FROM AppointmentStatusHistory
-    WHERE AppointmentId = @AppointmentId
-    ORDER BY ChangedAt ASC;
+    SELECT * FROM Visit WHERE AppointmentId = @AppointmentId;
 END
-GO
+Go
+
+CREATE PROCEDURE sp_UpdateVisit
+    @VisitId INT,
+    @Notes NVARCHAR(MAX),
+    @IsFinalized BIT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Only allow update if not finalized
+    IF EXISTS (SELECT 1 FROM Visit WHERE VisitId = @VisitId AND IsFinalized = 1)
+    BEGIN
+        RAISERROR('Visit is finalized and cannot be edited.', 16, 1);
+        RETURN;
+    END
+
+    UPDATE Visit
+    SET Notes = @Notes,
+        IsFinalized = @IsFinalized,
+        UpdatedAt = GETDATE()
+    WHERE VisitId = @VisitId;
+
+    SELECT * FROM Visit WHERE VisitId = @VisitId;
+END

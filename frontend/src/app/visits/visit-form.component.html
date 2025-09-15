@@ -1,0 +1,31 @@
+<app-navbar />
+<div class="visit-form-container card">
+  <h2>Document Visit</h2>
+  @if (loading) {
+    <div>Loading visit...</div>
+  }
+  @if (error) {
+    <div class="error">{{ error }}</div>
+  }
+  @if (!loading && !error) {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <label for="notes">Notes</label>
+  <textarea id="notes" formControlName="notes" rows="7" [readonly]="visit?.isFinalized"></textarea>
+      @if (form.controls['notes'].touched && form.controls['notes'].invalid) {
+        <div class="error">Notes are required (max 2000 chars).</div>
+      }
+      <div class="finalize-row">
+        <label>
+          <input type="checkbox" formControlName="isFinalized" />
+          Mark as Finalized (cannot edit after)
+        </label>
+      </div>
+  <button class="modern-btn" type="submit" [disabled]="form.invalid || loading || !!visit?.isFinalized">
+        @if (loading) { Saving... } @else if (visit) { Update Visit } @else { Create Visit }
+      </button>
+    </form>
+    @if (visit?.isFinalized) {
+      <div class="info">This visit is finalized and cannot be edited.</div>
+    }
+  }
+</div>

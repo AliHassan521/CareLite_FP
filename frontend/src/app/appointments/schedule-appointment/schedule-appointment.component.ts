@@ -104,7 +104,8 @@ export class ScheduleAppointmentComponent implements OnInit {
     }, { headers: this.headers }).subscribe({
       next: () => {
         this.messageService.showMessage({ type: 'success', text: 'Appointment scheduled!' }, 4000);
-        this.router.navigate(['/dashboard']);
+        // Redirect to provider calendar and pass providerId for auto-refresh
+        this.router.navigate(['/provider-calendar'], { queryParams: { providerId: providerId } });
       },
       error: err => {
         this.messageService.showMessage({ type: 'error', text: err.error?.Message || 'Failed to schedule appointment.' }, 4000);

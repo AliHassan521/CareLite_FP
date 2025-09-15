@@ -1,6 +1,6 @@
 
 <app-navbar/>
-<div class="patient-container">
+<div class="patient-container card">
   <h2>Patients</h2>
 
   @if (role === 'Admin' || role === 'Staff') {
@@ -34,7 +34,7 @@
         @if (addPatientForm.controls['address'].touched && addPatientForm.controls['address'].invalid) {
           <div class="error">Address is required.</div>
         }
-        <button type="submit" [disabled]="addPatientLoading || addPatientForm.invalid">
+        <button class="modern-btn" type="submit" [disabled]="addPatientLoading || addPatientForm.invalid">
           @if (addPatientLoading) { Adding... } @else { Add Patient }
         </button>
         <!-- Success/error messages are now shown globally via MessageService -->
@@ -51,8 +51,8 @@
             }
           </ul>
           <div>
-            <button (click)="confirmAddPatient()">Proceed Anyway</button>
-            <button (click)="cancelAddPatient()">Cancel</button>
+            <button class="modern-btn" (click)="confirmAddPatient()">Proceed Anyway</button>
+            <button class="modern-btn" (click)="cancelAddPatient()">Cancel</button>
           </div>
         </div>
       }
@@ -66,7 +66,7 @@
   <div class="controls">
     <form [formGroup]="searchForm" (ngSubmit)="onSearch()" style="display: flex; gap: 0.5rem; align-items: center;">
       <input type="text" placeholder="Search by name/email/phone..." formControlName="query" />
-      <button type="submit">Search</button>
+  <button class="modern-btn" type="submit">Search</button>
     </form>
   </div>
 
@@ -78,7 +78,7 @@
   }
 
   @if (patients.length > 0) {
-    <table>
+  <table class="modern-table">
       <thead>
         <tr>
           <th>Name</th>

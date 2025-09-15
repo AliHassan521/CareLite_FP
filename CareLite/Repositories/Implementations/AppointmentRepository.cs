@@ -1,3 +1,4 @@
+        
 using CareLite.Data;
 using CareLite.Models.Domain;
 using CareLite.Repositories.Interfaces;
@@ -111,41 +112,18 @@ namespace CareLite.Repositories.Implementations
             return appointments;
         }
 
-        public async Task<List<AppointmentStatusHistory>> GetAppointmentStatusHistoryAsync(int appointmentId)
-        {
-            var history = new List<AppointmentStatusHistory>();
-            using var conn = _dbManager.GetConnection();
-            using var cmd = new SqlCommand("sp_GetAppointmentStatusHistory", conn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("@AppointmentId", appointmentId);
-
-            await conn.OpenAsync();
-            using var reader = await cmd.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                history.Add(new AppointmentStatusHistory
-                {
-                    HistoryId = (int)reader["HistoryId"],
-                    AppointmentId = (int)reader["AppointmentId"],
-                    OldStatus = reader["OldStatus"] == DBNull.Value ? null : reader["OldStatus"].ToString(),
-                    NewStatus = reader["NewStatus"].ToString(),
-                    ChangedAt = (DateTime)reader["ChangedAt"],
-                    ChangedBy = reader["ChangedBy"] == DBNull.Value ? null : (int?)reader["ChangedBy"]
-                });
-            }
-            return history;
-        }
         public async Task<Appointment> GetOverlappingAppointmentAsync(int providerId, DateTime startTime, int durationMinutes, int? excludeAppointmentId = null)
         {
             using var conn = _dbManager.GetConnection();
-            using var cmd = new SqlCommand(@"SELECT TOP 1 * FROM Appointments WHERE ProviderId = @ProviderId AND Status = 'Scheduled' AND (
-                (@StartTime < DATEADD(minute, DurationMinutes, StartTime) AND DATEADD(minute, @DurationMinutes, @StartTime) > StartTime)
-            )" + (excludeAppointmentId.HasValue ? " AND AppointmentId <> @ExcludeAppointmentId" : ""), conn);
+            using var cmd = new SqlCommand("sp_GetOverlappingAppointment", conn);
+            cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("@ProviderId", providerId);
             cmd.Parameters.AddWithValue("@StartTime", startTime);
             cmd.Parameters.AddWithValue("@DurationMinutes", durationMinutes);
             if (excludeAppointmentId.HasValue)
                 cmd.Parameters.AddWithValue("@ExcludeAppointmentId", excludeAppointmentId.Value);
+            else
+                cmd.Parameters.AddWithValue("@ExcludeAppointmentId", DBNull.Value);
             await conn.OpenAsync();
             using var reader = await cmd.ExecuteReaderAsync();
             if (await reader.ReadAsync())
@@ -163,6 +141,32 @@ namespace CareLite.Repositories.Implementations
                 };
             }
             return null;
+        }
+        public async Task<List<Appointment>> GetAllAppointmentsAsync()
+        {
+            var appointments = new List<Appointment>();
+            using var conn = _dbManager.GetConnection();
+            using var cmd = new SqlCommand("sp_GetAllAppointments", conn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            await conn.OpenAsync();
+            using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                appointments.Add(new Appointment
+                {
+                    AppointmentId = (int)reader["AppointmentId"],
+                    PatientId = (int)reader["PatientId"],
+                    PatientName = reader["PatientName"].ToString(),
+                    ProviderId = (int)reader["ProviderId"],
+                    ProviderName = reader["ProviderName"].ToString(),
+                    StartTime = (DateTime)reader["StartTime"],
+                    DurationMinutes = (int)reader["DurationMinutes"],
+                    Status = reader["Status"].ToString(),
+                    CreatedAt = (DateTime)reader["CreatedAt"],
+                    UpdatedAt = reader["UpdatedAt"] == DBNull.Value ? null : (DateTime?)reader["UpdatedAt"]
+                });
+            }
+            return appointments;
         }
     }
 }

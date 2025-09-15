@@ -1,5 +1,5 @@
 <app-navbar />
-<div class="appointment-container">
+<div class="appointment-container card">
   <h2>Schedule Appointment</h2>
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <label>Patient</label>
@@ -54,7 +54,7 @@
     @if (form.controls['durationMinutes'].touched && form.controls['durationMinutes'].invalid) {
       <div class="error">Duration is required.</div>
     }
-    <button type="submit" [disabled]="form.invalid || loading">
+    <button class="modern-btn" type="submit" [disabled]="form.invalid || loading">
       @if (loading) { Scheduling... } @else { Schedule }
     </button>
   </form>

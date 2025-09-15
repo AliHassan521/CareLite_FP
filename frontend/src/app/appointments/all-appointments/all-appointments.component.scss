@@ -1,4 +1,4 @@
-.card {
+.all-appts-container.card {
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
@@ -8,9 +8,9 @@
 }
 
 .modern-table {
+  margin-top: 1rem;
   width: 100%;
   border-collapse: collapse;
-  margin-top: 1rem;
   background: #fafbfc;
   border-radius: 6px;
   overflow: hidden;
@@ -27,7 +27,8 @@
 .modern-table tr:nth-child(even) {
   background: #f9f9f9;
 }
-.error {
-  color: #e53935;
-  margin-top: 1rem;
+.completed-label {
+  color: #388e3c;
+  font-weight: 600;
 }
+.error { color: #d32f2f; margin: 1rem 0; }

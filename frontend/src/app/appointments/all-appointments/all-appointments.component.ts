@@ -1,79 +1,58 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { AppointmentService } from '../appointment.service';
-import { TokenService } from '../../services/token.service';
 import { Appointment } from '../appointment.model';
-import { NavbarComponent } from "../../shared/navbar/navbar.component";
-import { ProviderCalendarComponent } from '../provider-calendar/provider-calendar.component';
+import { TokenService } from '../../services/token.service';
 import { RouterModule } from '@angular/router';
+import { NavbarComponent } from '../../shared/navbar/navbar.component';
 
 @Component({
-  selector: 'app-my-appointments',
+  selector: 'app-all-appointments',
   standalone: true,
-  imports: [DatePipe, NavbarComponent, ProviderCalendarComponent, RouterModule],
-  templateUrl: './my-appointments.component.html',
-  styleUrls: ['./my-appointments.component.scss']
+  imports: [RouterModule, DatePipe, NavbarComponent],
+  templateUrl: './all-appointments.component.html',
+  styleUrls: ['./all-appointments.component.scss']
 })
-export class MyAppointmentsComponent implements OnInit {
+export class AllAppointmentsComponent implements OnInit {
   appointments: Appointment[] = [];
   loading = true;
   error: string | null = null;
+  userRole: string | null = null;
   private appointmentService = inject(AppointmentService);
   private tokenService = inject(TokenService);
-  providerId: number | null = null;
 
   ngOnInit() {
-    const payload = this.tokenService.getPayload();
-    this.providerId = payload?.userId || payload?.sub || payload?.nameid || null;
-    if (!this.providerId) {
-      this.error = 'Unable to determine provider ID.';
-      this.loading = false;
-      return;
-    }
-    // Get current week range
-    const now = new Date();
-    const day = now.getDay();
-    const diffToMonday = (day === 0 ? -6 : 1) - day;
-    const monday = new Date(now);
-    monday.setDate(now.getDate() + diffToMonday);
-    monday.setHours(0, 0, 0, 0);
-    const sunday = new Date(monday);
-    sunday.setDate(monday.getDate() + 6);
-    sunday.setHours(23, 59, 59, 999);
-    const weekStart = monday.toISOString();
-    const weekEnd = sunday.toISOString();
+    this.userRole = this.tokenService.getPayload()?.role || null;
+    this.loading = true;
     const token = this.tokenService.getToken();
     const headers: { [header: string]: string } = {};
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    this.appointmentService.getProviderAppointments(this.providerId, weekStart, weekEnd, headers).subscribe({
-      next: (appts) => {
+    this.appointmentService.getAllAppointments(headers).subscribe({
+      next: (appts: any) => {
         let arr: any[] = [];
         if (Array.isArray(appts)) {
           arr = appts;
-        } else if (appts && Array.isArray((appts as any).data)) {
-          arr = (appts as any).data;
-        } else if (appts && Array.isArray((appts as any).Data)) {
-          arr = (appts as any).Data;
+        } else if (appts && Array.isArray(appts.data)) {
+          arr = appts.data;
+        } else if (appts && Array.isArray(appts.Data)) {
+          arr = appts.Data;
         }
         this.appointments = arr.map(a => ({
           ...a,
           patientName: a.patientName || a.PatientName,
+          providerName: a.providerName || a.ProviderName,
+          providerId: a.providerId || a.ProviderId,
           startTime: a.startTime || a.StartTime,
           durationMinutes: a.durationMinutes || a.DurationMinutes,
-          status: a.status || a.Status,
-          showHistory: false
+          status: a.status || a.Status
         }));
         this.loading = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         this.error = err.error?.Message || 'Failed to load appointments.';
         this.loading = false;
       }
     });
-  }
-
-  trackById(index: number, appt: Appointment) {
-    return appt.appointmentId;
   }
 
   markAsCompleted(appt: Appointment) {
@@ -85,7 +64,7 @@ export class MyAppointmentsComponent implements OnInit {
     this.appointmentService.updateAppointment({
       appointmentId: appt.appointmentId,
       patientId: (appt as any).patientId || 0,
-      providerId: this.providerId!,
+  providerId: (appt as any).providerId || (appt as any).ProviderId || 0,
       startTime: appt.startTime,
       newStatus: 'Completed',
       durationMinutes: appt.durationMinutes

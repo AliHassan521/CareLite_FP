@@ -104,9 +104,9 @@ namespace CareLite.Controllers
 
             try
             {
-                // Fetch business hours and break times from service
+               
                 var (clinicStart, clinicEnd) = _businessHoursService.GetBusinessHoursForProvider(request.ProviderId);
-                // For demo, break time is hardcoded; replace with real logic if needed
+              
                 var breakStart = TimeSpan.FromHours(12);
                 var breakEnd = TimeSpan.FromHours(13);
 
@@ -154,22 +154,29 @@ namespace CareLite.Controllers
             }
         }
 
-        [HttpGet("{appointmentId}/status-history")]
-        [Authorize(Roles = "Admin,Staff,Clinician")]
-        public async Task<IActionResult> GetStatusHistory(int appointmentId)
+        [HttpGet("all")]
+        [Authorize(Roles = "Admin,Staff")]
+        public async Task<IActionResult> GetAllAppointments()
         {
-            var correlationId = Guid.NewGuid();
-            try
-            {
-                var history = await _appointmentService.GetAppointmentStatusHistoryAsync(appointmentId);
-                Response.Headers.Add("X-Correlation-Id", correlationId.ToString());
-                return Ok(new { Data = history, CorrelationId = correlationId });
-            }
-            catch (Exception ex)
-            {
-                Response.Headers.Add("X-Correlation-Id", correlationId.ToString());
-                return StatusCode(500, new { Message = "An error occurred", Details = ex.Message, CorrelationId = correlationId });
-            }
+            var appointments = await _appointmentService.GetAllAppointmentsAsync();
+            return Ok(new { data = appointments });
         }
+        /* [HttpGet("{appointmentId}/status-history")]
+         [Authorize(Roles = "Admin,Staff,Clinician")]
+         public async Task<IActionResult> GetStatusHistory(int appointmentId)
+         {
+             var correlationId = Guid.NewGuid();
+             try
+             {
+                 var history = await _appointmentService.GetAppointmentStatusHistoryAsync(appointmentId);
+                 Response.Headers.Add("X-Correlation-Id", correlationId.ToString());
+                 return Ok(new { Data = history, CorrelationId = correlationId });
+             }
+             catch (Exception ex)
+             {
+                 Response.Headers.Add("X-Correlation-Id", correlationId.ToString());
+                 return StatusCode(500, new { Message = "An error occurred", Details = ex.Message, CorrelationId = correlationId });
+             }
+         }*/
     }
 }

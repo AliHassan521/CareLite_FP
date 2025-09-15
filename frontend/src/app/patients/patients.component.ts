@@ -182,8 +182,25 @@ export class PatientsComponent implements OnInit, OnDestroy {
       { params, headers }
     ).subscribe({
       next: (res) => {
-        // Sort by fullName (case-insensitive)
-        this.patients = (res.patients || []).sort((a, b) => a.fullName.localeCompare(b.fullName, undefined, { sensitivity: 'base' }));
+        // Normalize fields and sort by fullName (case-insensitive, handle missing values)
+        this.patients = (res.patients || []).map(p => {
+          const pat: any = p;
+          return {
+            ...pat,
+            patientId: pat.patientId || pat.PatientId,
+            fullName: pat.fullName || pat.FullName,
+            email: pat.email || pat.Email,
+            phone: pat.phone || pat.Phone,
+            dateOfBirth: pat.dateOfBirth || pat.DateOfBirth,
+            gender: pat.gender || pat.Gender,
+            address: pat.address || pat.Address,
+            createdAt: pat.createdAt || pat.CreatedAt
+          };
+        }).sort((a, b) => {
+          const nameA = a.fullName || '';
+          const nameB = b.fullName || '';
+          return nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
+        });
         this.totalCount = res.total;
       },
       error: (err) => this.error = err.error?.Message || 'Failed to fetch patients.'

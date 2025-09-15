@@ -1,2 +1,18 @@
 <!-- provider-calendar.component.html -->
-<full-calendar [options]="calendarOptions"></full-calendar>
+<app-navbar />
+<div class="provider-calendar-container">
+	<div class="provider-calendar-controls card">
+		<label for="providerSelect">Provider:</label>
+		<select id="providerSelect" [(ngModel)]="selectedProviderId" (ngModelChange)="onProviderChange($event)" [disabled]="loadingProviders">
+			<option *ngFor="let provider of providers" [value]="provider.userId">{{ provider.fullName }}</option>
+		</select>
+	</div>
+	<div class="week-navigation card">
+		<button class="modern-btn" (click)="goToPreviousWeek()" [disabled]="loadingAppointments">&#8592; Previous</button>
+		<span class="week-label">{{ weekLabel }}</span>
+		<button class="modern-btn" (click)="goToNextWeek()" [disabled]="loadingAppointments">Next &#8594;</button>
+	</div>
+	<div class="calendar-card card">
+		<full-calendar [options]="calendarOptions"></full-calendar>
+	</div>
+</div>

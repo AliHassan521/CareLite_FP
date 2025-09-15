@@ -1,6 +1,6 @@
 <app-navbar />
-<div class="my-appts-container card">
-  <h2>My Appointments</h2>
+<div class="all-appts-container card">
+  <h2>All Appointments</h2>
   @if (loading) {
     <div>Loading appointments...</div>
   }
@@ -8,31 +8,34 @@
     <div class="error">{{ error }}</div>
   }
   @if (!loading && !error && appointments.length === 0) {
-    <div>No appointments found for this week.</div>
+    <div>No appointments found.</div>
   }
   @if (appointments.length > 0) {
     <table class="modern-table">
       <thead>
         <tr>
           <th>Patient</th>
+          <th>Provider</th>
           <th>Date/Time</th>
           <th>Duration (min)</th>
           <th>Status</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         @for (appt of appointments; track appt) {
           <tr>
             <td>{{ appt.patientName }}</td>
+            <td>{{ appt.providerName || appt.providerId }}</td>
             <td>{{ appt.startTime | date:'short' }}</td>
             <td>{{ appt.durationMinutes }}</td>
             <td>{{ appt.status }}</td>
             <td>
-              @if (appt.status === 'Completed') {
-                <a class="modern-btn" [routerLink]="['/my-appointments', appt.appointmentId, 'visit']">Document Visit</a>
-              }
-              @if (appt.status !== 'Completed') {
+              @if (appt.status !== 'Completed' && (userRole === 'Staff' || userRole === 'Admin')) {
                 <button class="modern-btn" (click)="markAsCompleted(appt)" [disabled]="loading">Mark as Completed</button>
+              }
+              @if (appt.status === 'Completed') {
+                <span class="completed-label">Completed</span>
               }
             </td>
           </tr>

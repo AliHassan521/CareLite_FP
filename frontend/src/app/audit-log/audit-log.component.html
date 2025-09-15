@@ -1,5 +1,5 @@
 <app-navbar />
-<div class="audit-log-container">
+<div class="audit-log-container card">
   <h2>Audit Log</h2>
   @if (loading) {
     <div>Loading...</div>
@@ -8,7 +8,7 @@
     <div class="error">{{ error }}</div>
   }
   @if (!loading && !error && logs.length) {
-    <table>
+  <table class="modern-table">
       <thead>
         <tr>
           <th>Time</th>
