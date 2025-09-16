@@ -1,11 +1,12 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FinanceService } from './finance.service';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-outstanding-balances',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, DecimalPipe],
   templateUrl: './outstanding-balances.component.html',
   styleUrls: ['./outstanding-balances.component.scss']
 })

@@ -56,6 +56,23 @@ export const routes: Routes = [
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Admin', 'Staff'] }
   },
-  // Add more routes for billing, reports, etc. with appropriate roles as needed
+  {
+    path: 'billing',
+    loadComponent: () => import('./bill/bill-view.component').then(m => m.BillViewComponent),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['Admin', 'Staff'] }
+  },
+  {
+    path: 'payments',
+    loadComponent: () => import('./payment/payment-form.component').then(m => m.PaymentFormComponent),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['Admin', 'Staff'] }
+  },
+  {
+    path: 'reports',
+    loadComponent: () => import('./finance/outstanding-balances.component').then(m => m.OutstandingBalancesComponent),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['Admin', 'Staff'] }
+  },
   { path: '**', redirectTo: 'signin' }
 ];

@@ -29,7 +29,6 @@ namespace CareLite.Repositories.Implementations
             cmd.Parameters.AddWithValue("@ProviderId", appointment.ProviderId);
             cmd.Parameters.AddWithValue("@StartTime", appointment.StartTime);
             cmd.Parameters.AddWithValue("@DurationMinutes", appointment.DurationMinutes);
-            cmd.Parameters.AddWithValue("@CreatedBy", createdByUserId);
 
             var appointmentIdParam = new SqlParameter("@AppointmentId", SqlDbType.Int)
             {

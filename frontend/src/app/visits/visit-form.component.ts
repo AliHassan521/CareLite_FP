@@ -15,7 +15,7 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
   styleUrls: ['./visit-form.component.scss']
 })
 export class VisitFormComponent implements OnInit {
-  @Input() appointmentId?: number;
+  appointmentId?: number;
   visit: Visit | null = null;
   loading = true;
   error: string | null = null;
@@ -28,17 +28,12 @@ export class VisitFormComponent implements OnInit {
   private router = inject(Router);
 
   ngOnInit() {
-    console.log('[VisitForm] ngOnInit, initial appointmentId:', this.appointmentId);
-    if (!this.appointmentId) {
-      this.route.paramMap.subscribe((params: any) => {
-        const paramId = params.get('appointmentId');
-        console.log('[VisitForm] route param appointmentId:', paramId);
-        this.appointmentId = paramId ? Number(paramId) : undefined;
-        this.loadVisit();
-      });
-    } else {
+    this.route.paramMap.subscribe((params: any) => {
+      const paramId = params.get('appointmentId');
+      console.log('[VisitForm] route param appointmentId:', paramId);
+      this.appointmentId = paramId ? Number(paramId) : undefined;
       this.loadVisit();
-    }
+    });
   }
 
   loadVisit() {
@@ -69,15 +64,14 @@ export class VisitFormComponent implements OnInit {
   onSubmit() {
     if (!this.appointmentId || this.form.invalid) return;
     this.loading = true;
-    const payload: Visit = {
-      appointmentId: this.appointmentId,
-      clinicianId: 0,
+    const payload: Partial<Visit> = {
+      appointmentId: Number(this.appointmentId),
       notes: this.form.value.notes!,
       isFinalized: !!this.form.value.isFinalized
     };
-    if (this.visit) {
-      payload.visitId = this.visit.visitId;
-      this.visitService.updateVisit({ ...payload, clinicianId: this.visit.clinicianId }).subscribe({
+    if (this.visit && this.visit.visitId) {
+      (payload as any).visitId = this.visit.visitId;
+      this.visitService.updateVisit(payload as Visit).subscribe({
         next: (res: { Data: Visit }) => {
           console.log('Visit update response:', res);
           if (res && res.Data) {
@@ -93,7 +87,7 @@ export class VisitFormComponent implements OnInit {
         }
       });
     } else {
-      this.visitService.createVisit(payload).subscribe({
+      this.visitService.createVisit(payload as Visit).subscribe({
         next: (res: { Data: Visit }) => {
           console.log('Visit create response:', res);
           if (res && res.Data) {

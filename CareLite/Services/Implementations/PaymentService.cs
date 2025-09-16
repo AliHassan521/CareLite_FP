@@ -1,12 +1,12 @@
-using CareLite.Repositories.Implementations;
+using CareLite.Repositories.Interfaces;
 using System.Threading.Tasks;
 
 namespace CareLite.Services.Implementations
 {
-    public class PaymentService
+    public class PaymentService : CareLite.Services.Interfaces.IPaymentService
     {
-        private readonly PaymentRepository _repo;
-        public PaymentService(PaymentRepository repo)
+        private readonly IPaymentRepository _repo;
+        public PaymentService(IPaymentRepository repo)
         {
             _repo = repo;
         }

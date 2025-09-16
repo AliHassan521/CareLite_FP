@@ -81,7 +81,7 @@ export class ScheduleAppointmentComponent implements OnInit {
       .subscribe({
         
         next: res => {
-          this.providers = res.data || [];
+          this.providers = res.Data || [];
           //console.log('Providers loaded:', this.providers);
         },
         error: err => {

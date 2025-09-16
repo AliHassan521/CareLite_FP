@@ -1,5 +1,5 @@
 using CareLite.Models.DTO;
-using CareLite.Services.Implementations;
+using CareLite.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -12,8 +12,8 @@ namespace CareLite.Controllers
     [Route("api/[controller]")]
     public class BillController : ControllerBase
     {
-        private readonly BillService _billService;
-        public BillController(BillService billService)
+        private readonly IBillService _billService;
+        public BillController(IBillService billService)
         {
             _billService = billService;
         }

@@ -1,13 +1,13 @@
 using CareLite.Models.Domain;
-using System;
+using CareLite.Data;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
 
-namespace CareLite.Repositories.Implementations
+namespace CareLite.Repositories.Interfaces
 {
-    public class BillRepository
+    public class BillRepository : IBillRepository
     {
         private readonly DbManager _dbManager;
         public BillRepository(DbManager dbManager)

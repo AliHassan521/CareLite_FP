@@ -1,9 +1,11 @@
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { BillService } from './bill.service';
 import { Bill } from './bill.model';
+import { DecimalPipe } from '@angular/common';
 @Component({
   selector: 'app-bill-view',
   standalone: true,
+  imports: [DecimalPipe],
   templateUrl: './bill-view.component.html',
   styleUrls: ['./bill-view.component.scss']
 })

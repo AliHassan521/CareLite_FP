@@ -1,4 +1,4 @@
-using CareLite.Services.Implementations;
+using CareLite.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -9,8 +9,8 @@ namespace CareLite.Controllers
     [Route("api/[controller]")]
     public class PaymentController : ControllerBase
     {
-        private readonly PaymentService _paymentService;
-        public PaymentController(PaymentService paymentService)
+        private readonly IPaymentService _paymentService;
+        public PaymentController(IPaymentService paymentService)
         {
             _paymentService = paymentService;
         }

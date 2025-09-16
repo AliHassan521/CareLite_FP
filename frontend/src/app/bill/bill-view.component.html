@@ -22,7 +22,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (let item of bill.lineItems) {
+        @for (item of bill.lineItems; track item.billLineItemId) {
           <tr>
             <td>{{ item.description }}</td>
             <td>{{ item.amount | number:'1.2-2' }}</td>

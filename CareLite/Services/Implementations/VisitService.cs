@@ -13,7 +13,7 @@ namespace CareLite.Services.Implementations
             _repo = repo;
         }
 
-        public async Task<Visit> CreateVisitAsync(Visit visit)
+        public async Task<Visit> CreateVisitAsync(Visit visit) 
         {
             return await _repo.CreateVisitAsync(visit);
         }

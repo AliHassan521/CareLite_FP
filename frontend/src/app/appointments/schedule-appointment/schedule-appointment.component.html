@@ -5,8 +5,8 @@
     <label>Patient</label>
     <select formControlName="patientId">
       <option value="">Select patient</option>
-      @for (patient of patients; track patient.patientId) {
-      <option [value]="patient.patientId">{{ patient.fullName }}</option>
+      @for (patient of patients; track patient.PatientId) {
+      <option [value]="patient.PatientId">{{ patient.FullName }}</option>
       }
     </select>
     @if (form.controls['patientId'].touched && form.controls['patientId'].invalid) {

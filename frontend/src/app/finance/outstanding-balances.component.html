@@ -24,7 +24,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (let b of balances) {
+        @for (b of balances; track b.BillId) {
           <tr>
             <td>{{ b.FullName }}</td>
             <td>{{ b.BillId }}</td>

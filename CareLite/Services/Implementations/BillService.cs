@@ -1,14 +1,14 @@
 using CareLite.Models.Domain;
-using CareLite.Repositories.Implementations;
+using CareLite.Repositories.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace CareLite.Services.Implementations
+namespace CareLite.Services.Interfaces
 {
-    public class BillService
+    public class BillService : IBillService
     {
-        private readonly BillRepository _repo;
-        public BillService(BillRepository repo)
+        private readonly IBillRepository _repo;
+        public BillService(IBillRepository repo)
         {
             _repo = repo;
         }

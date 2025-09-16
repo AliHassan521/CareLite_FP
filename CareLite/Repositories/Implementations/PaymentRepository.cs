@@ -1,12 +1,12 @@
 using CareLite.Models.Domain;
-using System;
+using CareLite.Data;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace CareLite.Repositories.Implementations
 {
-    public class PaymentRepository
+    public class PaymentRepository : CareLite.Repositories.Interfaces.IPaymentRepository
     {
         private readonly DbManager _dbManager;
         public PaymentRepository(DbManager dbManager)

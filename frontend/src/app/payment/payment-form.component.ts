@@ -2,11 +2,12 @@ import { Component, Input, OnInit, inject } from '@angular/core';
 import { PaymentService } from './payment.service';
 import { Bill } from '../bill/bill.model';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-payment-form',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, DecimalPipe],
   templateUrl: './payment-form.component.html',
   styleUrls: ['./payment-form.component.scss']
 })

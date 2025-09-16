@@ -18,6 +18,8 @@
           <th>Date/Time</th>
           <th>Duration (min)</th>
           <th>Status</th>
+          <th>Visit Status</th>
+          <th>Visit Notes</th>
         </tr>
       </thead>
       <tbody>
@@ -27,6 +29,20 @@
             <td>{{ appt.startTime | date:'short' }}</td>
             <td>{{ appt.durationMinutes }}</td>
             <td>{{ appt.status }}</td>
+            <td>
+              @if (appt.visit) {
+                {{ appt.visit.isFinalized ? 'Documented' : 'Pending' }}
+              } @else {
+                No Visit
+              }
+            </td>
+            <td>
+              @if (appt.visit && appt.visit.notes) {
+                {{ appt.visit.notes }}
+              } @else {
+                -
+              }
+            </td>
             <td>
               @if (appt.status === 'Completed') {
                 <a class="modern-btn" [routerLink]="['/my-appointments', appt.appointmentId, 'visit']">Document Visit</a>

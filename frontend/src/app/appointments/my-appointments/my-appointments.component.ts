@@ -3,6 +3,8 @@ import { DatePipe } from '@angular/common';
 import { AppointmentService } from '../appointment.service';
 import { TokenService } from '../../services/token.service';
 import { Appointment } from '../appointment.model';
+import { VisitService } from '../../visits/visit.service';
+import { Visit } from '../../visits/visit.model';
 import { NavbarComponent } from "../../shared/navbar/navbar.component";
 import { ProviderCalendarComponent } from '../provider-calendar/provider-calendar.component';
 import { RouterModule } from '@angular/router';
@@ -15,11 +17,12 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./my-appointments.component.scss']
 })
 export class MyAppointmentsComponent implements OnInit {
-  appointments: Appointment[] = [];
+  appointments: (Appointment & { visit?: Visit | null })[] = [];
   loading = true;
   error: string | null = null;
   private appointmentService = inject(AppointmentService);
   private tokenService = inject(TokenService);
+  private visitService = inject(VisitService);
   providerId: number | null = null;
 
   ngOnInit() {
@@ -55,15 +58,30 @@ export class MyAppointmentsComponent implements OnInit {
         } else if (appts && Array.isArray((appts as any).Data)) {
           arr = (appts as any).Data;
         }
-        this.appointments = arr.map(a => ({
-          ...a,
-          patientName: a.patientName || a.PatientName,
-          startTime: a.startTime || a.StartTime,
-          durationMinutes: a.durationMinutes || a.DurationMinutes,
-          status: a.status || a.Status,
-          showHistory: false
-        }));
-        this.loading = false;
+        // Fetch visits for each appointment
+        Promise.all(arr.map(async a => {
+          const appointmentId = a.appointmentId || a.AppointmentId;
+          let visit: Visit | null = null;
+          try {
+            const result = await this.visitService.getVisitByAppointment(appointmentId).toPromise();
+            visit = result ?? null;
+          } catch (e) {
+            visit = null;
+          }
+          return {
+            ...a,
+            appointmentId,
+            patientName: a.patientName || a.PatientName,
+            startTime: a.startTime || a.StartTime,
+            durationMinutes: a.durationMinutes || a.DurationMinutes,
+            status: a.status || a.Status,
+            showHistory: false,
+            visit
+          };
+        })).then(results => {
+          this.appointments = results;
+          this.loading = false;
+        });
       },
       error: (err) => {
         this.error = err.error?.Message || 'Failed to load appointments.';
