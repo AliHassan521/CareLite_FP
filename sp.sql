@@ -538,3 +538,138 @@ BEGIN
 
     SELECT * FROM Visit WHERE VisitId = @VisitId;
 END
+
+GO
+
+-- Billing: Create or fetch bill for a visit
+CREATE PROCEDURE sp_GenerateOrGetBill
+    @VisitId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @BillId INT;
+
+    -- Check if bill already exists for this visit
+    SELECT @BillId = BillId FROM Bill WHERE VisitId = @VisitId;
+    IF @BillId IS NOT NULL
+    BEGIN
+        -- Return existing bill and line items
+        SELECT * FROM Bill WHERE BillId = @BillId;
+        SELECT * FROM BillLineItem WHERE BillId = @BillId;
+        RETURN;
+    END
+
+    -- Example: Generate bill with simple rules (one line item for demo)
+    DECLARE @TotalAmount DECIMAL(18,2) = 100.00; -- Replace with real calculation
+    INSERT INTO Bill (VisitId, CreatedAt, TotalAmount, IsFinalized)
+    VALUES (@VisitId, GETDATE(), @TotalAmount, 0);
+    SET @BillId = SCOPE_IDENTITY();
+
+    INSERT INTO BillLineItem (BillId, Description, Amount)
+    VALUES (@BillId, 'Consultation Fee', @TotalAmount);
+
+    -- Return new bill and line items
+    SELECT * FROM Bill WHERE BillId = @BillId;
+    SELECT * FROM BillLineItem WHERE BillId = @BillId;
+END
+
+GO
+
+CREATE PROCEDURE sp_GetBillByVisit
+    @VisitId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @BillId INT;
+    SELECT @BillId = BillId FROM Bill WHERE VisitId = @VisitId;
+    IF @BillId IS NULL
+    BEGIN
+        RAISERROR('No bill found for this visit.', 16, 1);
+        RETURN;
+    END
+    SELECT * FROM Bill WHERE BillId = @BillId;
+    SELECT * FROM BillLineItem WHERE BillId = @BillId;
+END
+
+GO
+
+-- Payment: Record payment against bill
+CREATE PROCEDURE sp_RecordPayment
+    @BillId INT,
+    @Amount DECIMAL(18,2),
+    @Method VARCHAR(20),
+    @PostedByUserId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @TotalPaid DECIMAL(18,2);
+    DECLARE @TotalAmount DECIMAL(18,2);
+
+    SELECT @TotalPaid = ISNULL(SUM(Amount), 0) FROM Payment WHERE BillId = @BillId;
+    SELECT @TotalAmount = TotalAmount FROM Bill WHERE BillId = @BillId;
+
+    IF @Amount <= 0
+    BEGIN
+        RAISERROR('Payment amount must be positive.', 16, 1);
+        RETURN;
+    END
+
+    IF @TotalPaid + @Amount > @TotalAmount
+    BEGIN
+        RAISERROR('Payment exceeds bill balance.', 16, 1);
+        RETURN;
+    END
+
+    INSERT INTO Payment (BillId, Amount, Method, PostedByUserId, PostedAt)
+    VALUES (@BillId, @Amount, @Method, @PostedByUserId, GETDATE());
+
+    -- Audit log
+    DECLARE @CorrelationId UNIQUEIDENTIFIER = NEWID();
+    INSERT INTO AuditLogs (CorrelationId, UserId, Action, Description, CreatedAt)
+    VALUES (
+        @CorrelationId,
+        @PostedByUserId,
+        'RecordPayment',
+        CONCAT('Payment of ', @Amount, ' (', @Method, ') posted to BillId ', @BillId),
+        GETDATE()
+    );
+
+    -- Return updated bill balance
+    SELECT @TotalAmount AS TotalAmount, (@TotalAmount - (@TotalPaid + @Amount)) AS RemainingBalance;
+END
+
+    GO
+
+    -- Finance: Outstanding balances report
+    CREATE PROCEDURE sp_ReportOutstandingBalances
+        @PatientName VARCHAR(150) = NULL
+    AS
+    BEGIN
+        SET NOCOUNT ON;
+        SELECT p.PatientId, p.FullName, b.BillId, b.TotalAmount,
+            ISNULL(SUM(pay.Amount), 0) AS TotalPaid,
+            (b.TotalAmount - ISNULL(SUM(pay.Amount), 0)) AS OutstandingBalance
+        FROM Bill b
+        INNER JOIN Visit v ON b.VisitId = v.VisitId
+        INNER JOIN Appointments a ON v.AppointmentId = a.AppointmentId
+        INNER JOIN Patients p ON a.PatientId = p.PatientId
+        LEFT JOIN Payment pay ON b.BillId = pay.BillId
+        WHERE (@PatientName IS NULL OR p.FullName LIKE '%' + @PatientName + '%')
+        GROUP BY p.PatientId, p.FullName, b.BillId, b.TotalAmount
+        HAVING (b.TotalAmount - ISNULL(SUM(pay.Amount), 0)) > 0
+        ORDER BY OutstandingBalance DESC;
+    END
+
+    GO
+
+    -- Finance: Daily collections report
+    CREATE PROCEDURE sp_ReportDailyCollections
+        @Date DATE
+    AS
+    BEGIN
+        SET NOCOUNT ON;
+        SELECT pay.Method, SUM(pay.Amount) AS TotalCollected
+        FROM Payment pay
+        WHERE CAST(pay.PostedAt AS DATE) = @Date
+        GROUP BY pay.Method;
+    END

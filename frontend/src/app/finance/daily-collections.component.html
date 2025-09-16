@@ -1,0 +1,33 @@
+<div class="finance-report card">
+  <h2>Daily Collections</h2>
+  <form [formGroup]="form" (ngSubmit)="loadCollections()">
+    <label for="date">Date</label>
+    <input id="date" type="date" formControlName="date" />
+    <button class="modern-btn" type="submit" [disabled]="loading">Filter</button>
+    <button class="modern-btn" type="button" (click)="exportCsv()">Export CSV</button>
+  </form>
+  @if (loading) {
+    <div>Loading...</div>
+  }
+  @if (error) {
+    <div class="error">{{ error }}</div>
+  }
+  @if (!loading && collections.length) {
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>Method</th>
+          <th>Total Collected</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (let c of collections) {
+          <tr>
+            <td>{{ c.Method }}</td>
+            <td>{{ c.TotalCollected | number:'1.2-2' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

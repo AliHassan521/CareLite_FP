@@ -15,12 +15,39 @@ CREATE TABLE Users
     IsActive BIT NOT NULL DEFAULT 1,
     CreatedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
     UpdatedAt DATETIME NULL
+GO
+
+-- Billing tables
+IF OBJECT_ID('Bill', 'U') IS NOT NULL
+    DROP TABLE Bill;
+GO
+CREATE TABLE Bill (
+    BillId INT IDENTITY(1,1) PRIMARY KEY,
+    VisitId INT NOT NULL,
+    CreatedAt DATETIME NOT NULL DEFAULT GETDATE(),
+    TotalAmount DECIMAL(18,2) NOT NULL,
+    IsFinalized BIT NOT NULL DEFAULT 0,
+    CONSTRAINT FK_Bill_Visit FOREIGN KEY (VisitId) REFERENCES Visit(VisitId)
 );
 GO
 
--- Drop existing table if exists
-IF OBJECT_ID('Roles', 'U') IS NOT NULL
-    DROP TABLE Roles;
+IF OBJECT_ID('BillLineItem', 'U') IS NOT NULL
+    DROP TABLE BillLineItem;
+GO
+CREATE TABLE BillLineItem (
+    BillLineItemId INT IDENTITY(1,1) PRIMARY KEY,
+    BillId INT NOT NULL,
+    Description VARCHAR(200) NOT NULL,
+    Amount DECIMAL(18,2) NOT NULL,
+    CONSTRAINT FK_BillLineItem_Bill FOREIGN KEY (BillId) REFERENCES Bill(BillId)
+);
+GO
+
+INSERT INTO Patients (FullName, Email, Phone, DateOfBirth, Gender, Address)
+VALUES
+('Jane Smith', 'jane.smith@example.com', '2345678901', '1990-05-15', 'Female', '456 Oak Ave'),
+('Alice Johnson', 'alice.johnson@example.com', '3456789012', '1978-09-23', 'Female', '789 Pine Rd'),
+('Bob Brown', 'bob.brown@example.com', '4567890123', '1982-12-11', 'Male', '321 Maple Dr');
 GO
 
 CREATE TABLE Roles
@@ -64,7 +91,6 @@ CREATE TABLE Patients (
 	CreatedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
     UpdatedAt DATETIME NULL,
     IsActive BIT NOT NULL DEFAULT 1,
-    CONSTRAINT UQ_Patient_Email UNIQUE(Email),
     CONSTRAINT UQ_Patient_Phone UNIQUE(Phone)
 );
 
@@ -80,7 +106,6 @@ GO
 
 CREATE TABLE Appointments (
     AppointmentId INT IDENTITY(1,1) PRIMARY KEY,
-    PatientId INT NOT NULL,
     ProviderId INT NOT NULL, -- UserId of provider (Clinician)
     StartTime DATETIME NOT NULL,
     DurationMinutes INT NOT NULL, -- 15, 30, or 60

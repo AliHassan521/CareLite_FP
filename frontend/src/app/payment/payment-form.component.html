@@ -1,0 +1,26 @@
+<div class="payment-form card">
+  <h3>Record Payment</h3>
+  @if (error) {
+    <div class="error">{{ error }}</div>
+  }
+  @if (success) {
+    <div class="success">{{ success }}</div>
+  }
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-row">
+      <label for="amount">Amount</label>
+      <input id="amount" type="number" formControlName="amount" min="0.01" step="0.01" [max]="remainingBalance" />
+    </div>
+    <div class="form-row">
+      <label for="method">Method</label>
+      <select id="method" formControlName="method">
+        <option value="Cash">Cash</option>
+        <option value="Card">Card</option>
+      </select>
+    </div>
+    <button class="modern-btn" type="submit" [disabled]="form.invalid || loading">Record Payment</button>
+    <div class="balance-info">
+      <strong>Remaining Balance:</strong> {{ remainingBalance | number:'1.2-2' }}
+    </div>
+  </form>
+</div>

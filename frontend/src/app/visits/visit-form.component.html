@@ -27,5 +27,6 @@
     @if (visit?.isFinalized) {
       <div class="info">This visit is finalized and cannot be edited.</div>
     }
+    <app-bill-view [visitId]="visit?.visitId"></app-bill-view>
   }
 </div>

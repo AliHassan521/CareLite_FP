@@ -1,0 +1,29 @@
+.bill-view-container {
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom: 2rem;
+}
+.bill-summary {
+  margin-bottom: 1rem;
+}
+.bill-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+.bill-table th, .bill-table td {
+  border: 1px solid #e0e0e0;
+  padding: 0.5rem 1rem;
+  text-align: left;
+}
+.bill-total {
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: right;
+}
+.error {
+  color: #c00;
+  margin-bottom: 1rem;
+}

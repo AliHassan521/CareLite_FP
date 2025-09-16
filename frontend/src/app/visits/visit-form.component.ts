@@ -2,13 +2,15 @@ import { Component, Input, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { VisitService } from './visit.service';
 import { Visit } from './visit.model';
+// Bill imports
+import { BillViewComponent } from '../bill/bill-view.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NavbarComponent } from '../shared/navbar/navbar.component';
 
 @Component({
   selector: 'app-visit-form',
   standalone: true,
-  imports: [ReactiveFormsModule, NavbarComponent],
+  imports: [ReactiveFormsModule, NavbarComponent, BillViewComponent],
   templateUrl: './visit-form.component.html',
   styleUrls: ['./visit-form.component.scss']
 })
@@ -28,7 +30,7 @@ export class VisitFormComponent implements OnInit {
   ngOnInit() {
     console.log('[VisitForm] ngOnInit, initial appointmentId:', this.appointmentId);
     if (!this.appointmentId) {
-      this.route.paramMap.subscribe(params => {
+      this.route.paramMap.subscribe((params: any) => {
         const paramId = params.get('appointmentId');
         console.log('[VisitForm] route param appointmentId:', paramId);
         this.appointmentId = paramId ? Number(paramId) : undefined;
@@ -44,7 +46,7 @@ export class VisitFormComponent implements OnInit {
     this.loading = true;
     console.log('[VisitForm] Calling getVisitByAppointment with appointmentId:', this.appointmentId);
     this.visitService.getVisitByAppointment(this.appointmentId).subscribe({
-      next: visit => {
+      next: (visit: Visit | null) => {
         console.log('[VisitForm] getVisitByAppointment response:', visit);
         this.visit = visit;
         if (visit) {
@@ -56,7 +58,7 @@ export class VisitFormComponent implements OnInit {
         }
         this.loading = false;
       },
-      error: err => {
+      error: (err: any) => {
         console.error('[VisitForm] getVisitByAppointment error:', err);
         this.error = err.error?.Message || 'Failed to load visit.';
         this.loading = false;
@@ -76,7 +78,7 @@ export class VisitFormComponent implements OnInit {
     if (this.visit) {
       payload.visitId = this.visit.visitId;
       this.visitService.updateVisit({ ...payload, clinicianId: this.visit.clinicianId }).subscribe({
-        next: res => {
+        next: (res: { Data: Visit }) => {
           console.log('Visit update response:', res);
           if (res && res.Data) {
             this.visit = res.Data;
@@ -85,14 +87,14 @@ export class VisitFormComponent implements OnInit {
           }
           this.loading = false;
         },
-        error: err => {
+        error: (err: any) => {
           this.error = err.error?.Message || 'Failed to update visit.';
           this.loading = false;
         }
       });
     } else {
       this.visitService.createVisit(payload).subscribe({
-        next: res => {
+        next: (res: { Data: Visit }) => {
           console.log('Visit create response:', res);
           if (res && res.Data) {
             this.visit = res.Data;
@@ -101,7 +103,7 @@ export class VisitFormComponent implements OnInit {
           }
           this.loading = false;
         },
-        error: err => {
+        error: (err: any) => {
           this.error = err.error?.Message || 'Failed to create visit.';
           this.loading = false;
         }

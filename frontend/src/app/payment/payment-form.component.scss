@@ -1,0 +1,22 @@
+.payment-form {
+  padding: 1rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom: 2rem;
+}
+.form-row {
+  margin-bottom: 1rem;
+}
+.error {
+  color: #c00;
+  margin-bottom: 1rem;
+}
+.success {
+  color: #080;
+  margin-bottom: 1rem;
+}
+.balance-info {
+  margin-top: 1rem;
+  font-weight: bold;
+}
